@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Vaqelix - AI Study Assistant</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --dark-blue: #123b66;
+            --deep-blue: #0b2f52;
+            --sky-blue: #4db8ff;
+            --light-blue: #eaf7ff;
+            --white: #ffffff;
+            --text: #17324d;
+            --muted: #6c7f91;
+            --border: #d9e8f2;
+            --danger: #c0392b;
+            --success: #16845b;
+            --shadow: 0 10px 30px rgba(18, 59, 102, 0.10);
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f6fbff;
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .app {
+            min-height: 100vh;
+        }
+
+        /* HEADER */
+
+        .header {
+            background: linear-gradient(135deg, var(--deep-blue), var(--dark-blue));
+            color: white;
+            padding: 18px 24px;
+            box-shadow: 0 4px 18px rgba(11, 47, 82, 0.18);
+        }
+
+        .header-inner {
+            max-width: 1150px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-mark {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: var(--sky-blue);
+            color: var(--deep-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .brand h1 {
+            font-size: 25px;
+        }
+
+        .brand p {
+            color: #dcefff;
+            font-size: 13px;
+        }
+
+        .status-pill {
+            padding: 8px 13px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+            font-size: 13px;
+        }
+
+        /* MAIN */
+
+        main {
+            max-width: 1150px;
+            margin: 0 auto;
+            padding: 30px 20px 60px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, var(--white), var(--light-blue));
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .hero h2 {
+            color: var(--deep-blue);
+            font-size: 30px;
+            margin-bottom: 8px;
+        }
+
+        .hero p {
+            color: var(--muted);
+            max-width: 720px;
+        }
+
+        .section {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .section-title h2 {
+            color: var(--deep-blue);
+            font-size: 22px;
+        }
+
+        .section-title p {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 3px;
+        }
+
+        /* MEMORY */
+
+        .memory-empty {
+            padding: 20px;
+            border: 1px dashed var(--border);
+            border-radius: 14px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        .session-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .session-card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            background: #fbfdff;
+            transition: 0.2s ease;
+        }
+
+        .session-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--sky-blue);
+        }
+
+        .session-card h3 {
+            color: var(--dark-blue);
+            margin-bottom: 4px;
+        }
+
+        .session-topic {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .session-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 999px;
+            background: var(--light-blue);
+            color: var(--dark-blue);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .session-date {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .session-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* BUTTONS */
+
+        .btn {
+            border: none;
+            border-radius: 11px;
+            padding: 11px 15px;
+            font-weight: 700;
+            transition: 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--sky-blue);
+            color: var(--deep-blue);
+        }
+
+        .btn-primary:hover {
+            background: #2da9f5;
+        }
+
+        .btn-dark {
+            background: var(--dark-blue);
+            color: white;
+        }
+
+        .btn-dark:hover {
+            background: var(--deep-blue);
+        }
+
+        .btn-danger {
+            background: #fff0ef;
+            color: var(--danger);
+            border: 1px solid #ffd8d4;
+        }
+
+        .btn-light {
+            background: var(--light-blue);
+            color: var(--dark-blue);
+        }
+
+        .btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        /* NEW STUDY */
+
+        .new-study-panel {
+            display: none;
+            margin-top: 18px;
+            padding: 18px;
+            background: var(--light-blue);
+            border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .new-study-panel.active {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 12px;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            color: var(--dark-blue);
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            padding: 12px 13px;
+            background: white;
+            color: var(--text);
+            outline: none;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--sky-blue);
+            box-shadow: 0 0 0 3px rgba(77,184,255,0.15);
+        }
+
+        /* CHAT */
+
+        .current-session {
+            background: var(--light-blue);
+            color: var(--dark-blue);
+            border-radius: 11px;
+            padding: 10px 13px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .chat-box {
+            height: 430px;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            background: #fafdff;
+            margin-bottom: 14px;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 14px;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .bubble {
+            max-width: 78%;
+            padding: 12px 15px;
+            border-radius: 15px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .message.user .bubble {
+            background: var(--dark-blue);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .bubble {
+            background: white;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-input-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+        }
+
+        .chat-input-row textarea {
+            min-height: 52px;
+            resize: vertical;
+        }
+
+        .chat-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 12px;
+        }
+
+        /* CARDS */
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .feature-card {
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            padding: 20px;
+            background: #fbfdff;
+        }
+
+        .feature-card h3 {
+            color: var(--dark-blue);
+            margin-bottom: 6px;
+        }
+
+        .feature-card p {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        /* QUIZ */
+
+        .quiz-settings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .count-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .count-btn {
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--dark-blue);
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-weight: 700;
+        }
+
+        .count-btn.active {
+            background: var(--sky-blue);
+            border-color: var(--sky-blue);
+            color: var(--deep-blue);
+        }
+
+        .custom-count {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .custom-count.active {
+            display: block;
+        }
+
+        .quiz-area {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .quiz-area.active {
+            display: block;
+        }
+
+        .quiz-progress {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 9px;
+            background: #e6f0f7;
+            border-radius: 99px;
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--sky-blue);
+            transition: width 0.25s ease;
+        }
+
+        .quiz-question {
+            font-size: 22px;
+            color: var(--deep-blue);
+            font-weight: 800;
+            margin-bottom: 18px;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option {
+            width: 100%;
+            text-align: left;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: 13px;
+            padding: 14px;
+            color: var(--text);
+        }
+
+        .option:hover {
+            border-color: var(--sky-blue);
+            background: #f5fbff;
+        }
+
+        .option.selected {
+            border-color: var(--sky-blue);
+            background: var(--light-blue);
+        }
+
+        .quiz-actions {
+            margin-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .score-box {
+            display: none;
+            text-align: center;
+            padding: 25px;
+            background: var(--light-blue);
+            border-radius: 17px;
+            margin-top: 20px;
+        }
+
+        .score-box.active {
+            display: block;
+        }
+
+        .score-number {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--dark-blue);
+        }
+
+        .review-list {
+            margin-top: 20px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .review-item {
+            padding: 15px;
+            border-radius: 13px;
+            border: 1px solid var(--border);
+            background: white;
+        }
+
+        .review-item.correct {
+            border-left: 5px solid var(--success);
+        }
+
+        .review-item.wrong {
+            border-left: 5px solid var(--danger);
+        }
+
+        .review-item strong {
+            display: block;
+            color: var(--dark-blue);
+            margin-bottom: 7px;
+        }
+
+        .review-answer {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* PRACTICE */
+
+        .practice-list {
+            display: grid;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .practice-item {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px;
+            background: #fbfdff;
+        }
+
+        .practice-item h4 {
+            color: var(--dark-blue);
+            margin-bottom: 7px;
+        }
+
+        .practice-answer {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* STATUS */
+
+        .notice {
+            padding: 12px 14px;
+            border-radius: 11px;
+            margin-top: 12px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .notice.show {
+            display: block;
+        }
+
+        .notice.error {
+            background: #fff0ef;
+            color: #9e2d22;
+        }
+
+        .notice.success {
+            background: #edfaf4;
+            color: #16704f;
+        }
+
+        .loading {
+            color: var(--muted);
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* FOOTER */
+
+        footer {
+            text-align: center;
+            color: var(--muted);
+            padding: 20px;
+            font-size: 13px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 900px) {
+            .session-list {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .header {
+                padding: 15px;
+            }
+
+            .header-inner {
+                align-items: flex-start;
+            }
+
+            .status-pill {
+                display: none;
+            }
+
+            main {
+                padding: 20px 12px 40px;
+            }
+
+            .hero {
+                padding: 21px;
+            }
+
+            .hero h2 {
+                font-size: 25px;
+            }
+
+            .section {
+                padding: 17px;
+                border-radius: 16px;
+            }
+
+            .session-list,
+            .feature-grid,
+            .quiz-settings {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-box {
+                height: 380px;
+            }
+
+            .bubble {
+                max-width: 90%;
+            }
+
+            .chat-input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .quiz-question {
+                font-size: 19px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <header class="header">
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-mark">V</div>
+                <div>
+                    <h1>Vaqelix</h1>
+                    <p>Your AI Study Assistant</p>
+                </div>
+            </div>
+
+            <div class="status-pill" id="connectionStatus">
+                Connecting...
+            </div>
+        </div>
+    </header>
+
+    <main>
+
+        <section class="hero">
+            <h2>Welcome back!</h2>
+            <p>
+                Learn, understand, practice, and test yourself with Vaqelix.
+                Your study sessions stay organized so you can continue learning later.
+            </p>
+        </section>
+
+        <!-- STUDY MEMORY -->
+
+        <section class="section">
+            <div class="section-title">
+                <div>
+                    <h2>📚 Study Memory</h2>
+                    <p>Continue previous studies or start something completely new.</p>
+                </div>
+            </div>
+
+            <div id="sessionList" class="session-list">
+                <div class="loading">Loading your study memory...</div>
+            </div>
+
+            <div style="margin-top:18px;">
+                <button class="btn btn-primary" id="newStudyButton">
+                    ➕ Start Something New
+                </button>
+            </div>
+
+            <div class="new-study-panel" id="newStudyPanel">
+                <div class="form-grid">
+                    <div>
+                        <label for="subjectInput">Subject</label>
+                        <input
+                            id="subjectInput"
+                            type="text"
+                            placeholder="e.g. Physics"
+                        >
+                    </div>
+
+                    <div>
+                        <label for="topicInput">Topic</label>
+                        <input
+                            id="topicInput"
+                            type="text"
+                            placeholder="e.g. Motion"
+                        >
+                    </div>
+
+                    <button class="btn btn-dark" id="createStudyButton">
+                        Start Studying
+                    </button>
+                </div>
+
+                <div class="notice" id="newStudyNotice"></div>
+            </div>
+        </section>
+
+        <!-- ASK VAQELIX -->
+
+        <section class="section">
+            <div class="section-title">
+                <div>
+                    <h2>🧠 Ask Vaqelix</h2>
+                    <p>Ask a study question and learn through conversation.</p>
+                </div>
+            </div>
+
+            <div class="current-session" id="currentSessionBox">
+                No study session selected yet.
+            </div>
+
+            <div class="chat-box" id="chatBox">
+                <div class="message assistant">
+                    <div class="bubble">
+                        Hi! I'm Vaqelix, your AI study assistant.
+
+                        You can ask me a study question or tell me what you want to study.
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-row">
+                <textarea
+                    id="questionInput"
+                    placeholder="Ask Vaqelix a study question..."
+                ></textarea>
+
+                <button class="btn btn-primary" id="sendButton">
+                    Send
+                </button>
+            </div>
+
+            <div class="chat-tools">
+                <button class="btn btn-light" id="simplifyButton">
+                    ✨ Explain Simpler
+                </button>
+
+                <button class="btn btn-dark" id="understandButton">
+                    I Understand It
+                </button>
+            </div>
+
+            <div class="notice" id="chatNotice"></div>
+        </section>
+
+        <!-- PRACTICE + QUIZ -->
+
+        <section class="section">
+            <div class="feature-grid">
+
+                <div class="feature-card">
+                    <h3>📝 Practice Questions</h3>
+                    <p>
+                        Create short practice questions to help you understand
+                        and review the current topic.
+                    </p>
+
+                    <button class="btn btn-primary" id="practiceButton">
+                        Create Practice Questions
+                    </button>
+
+                    <div class="notice" id="practiceNotice"></div>
+
+                    <div id="practiceList" class="practice-list"></div>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🎯 Quiz Me</h3>
+                    <p>
+                        Test your understanding with a multiple-choice quiz.
+                    </p>
+
+                    <button class="btn btn-dark" id="openQuizButton">
+                        Set Up Quiz
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- QUIZ -->
+
+        <section class="section" id="quizSection">
+
+            <div class="section-title">
+                <div>
+                    <h2>🎯 Quiz Me</h2>
+                    <p>Choose the quiz source and number of questions.</p>
+                </div>
+            </div>
+
+            <div class="quiz-settings">
+
+                <div>
+                    <label>Quiz Source</label>
+
+                    <select id="quizSource">
+                        <option value="topic">By Topic</option>
+                        <option value="material">From My Study Material</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Number of Questions</label>
+
+                    <div class="count-options">
+
+                        <button class="count-btn" data-count="3">3</button>
+                        <button class="count-btn active" data-count="5">5</button>
+                        <button class="count-btn" data-count="10">10</button>
+                        <button class="count-btn" data-count="15">15</button>
+                        <button class="count-btn" data-count="20">20</button>
+                        <button class="count-btn" data-count="custom">Custom</button>
+
+                    </div>
+
+                    <div class="custom-count" id="customCountBox">
+                        <input
+                            id="customCountInput"
+                            type="number"
+                            min="1"
+                            max="50"
+                            placeholder="Enter number of questions"
+                        >
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="margin-top:18px;">
+                <button class="btn btn-primary" id="startQuizButton">
+                    Start Quiz
+                </button>
+            </div>
+
+            <div class="notice" id="quizNotice"></div>
+
+            <div class="quiz-area" id="quizArea">
+
+                <div class="quiz-progress" id="quizProgress">
+                    Question 1
+                </div>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+
+                <div class="quiz-question" id="quizQuestion"></div>
+
+                <div class="options" id="quizOptions"></div>
+
+                <div class="quiz-actions">
+                    <button
+                        class="btn btn-light"
+                        id="previousQuestionButton"
+                        disabled
+                    >
+                        Previous
+                    </button>
+
+                    <button class="btn btn-dark" id="nextQuestionButton">
+                        Next
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="score-box" id="scoreBox">
+
+                <div>Your Quiz Result</div>
+
+                <div class="score-number" id="scoreNumber">
+                    0/0
+                </div>
+
+                <div id="scoreMessage"></div>
+
+                <div class="review-list" id="reviewList"></div>
+
+                <div style="margin-top:18px;">
+                    <button class="btn btn-primary" id="newQuizButton">
+                        Take Another Quiz
+                    </button>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        Vaqelix — Learn. Understand. Practice. Grow.
+    </footer>
+
+</div>
+
+<script>
+
+    const API_BASE = "http://127.0.0.1:8000";
+
+    let currentSessionId = null;
+    let currentSession = null;
+    let lastAssistantAnswer = "";
+
+    let selectedQuizCount = 5;
+    let quizData = [];
+    let quizAnswers = [];
+    let currentQuizIndex = 0;
+
+    const sessionList = document.getElementById("sessionList");
+    const currentSessionBox = document.getElementById("currentSessionBox");
+    const chatBox = document.getElementById("chatBox");
+    const questionInput = document.getElementById("questionInput");
+    const sendButton = document.getElementById("sendButton");
+    const simplifyButton = document.getElementById("simplifyButton");
+    const understandButton = document.getElementById("understandButton");
+
+    const newStudyButton = document.getElementById("newStudyButton");
+    const newStudyPanel = document.getElementById("newStudyPanel");
+    const createStudyButton = document.getElementById("createStudyButton");
+    const subjectInput = document.getElementById("subjectInput");
+    const topicInput = document.getElementById("topicInput");
+
+    const practiceButton = document.getElementById("practiceButton");
+    const practiceList = document.getElementById("practiceList");
+
+    const openQuizButton = document.getElementById("openQuizButton");
+    const quizSection = document.getElementById("quizSection");
+    const quizSource = document.getElementById("quizSource");
+    const startQuizButton = document.getElementById("startQuizButton");
+    const customCountBox = document.getElementById("customCountBox");
+    const customCountInput = document.getElementById("customCountInput");
+
+    const quizArea = document.getElementById("quizArea");
+    const quizProgress = document.getElementById("quizProgress");
+    const progressFill = document.getElementById("progressFill");
+    const quizQuestion = document.getElementById("quizQuestion");
+    const quizOptions = document.getElementById("quizOptions");
+    const previousQuestionButton = document.getElementById("previousQuestionButton");
+    const nextQuestionButton = document.getElementById("nextQuestionButton");
+
+    const scoreBox = document.getElementById("scoreBox");
+    const scoreNumber = document.getElementById("scoreNumber");
+    const scoreMessage = document.getElementById("scoreMessage");
+    const reviewList = document.getElementById("reviewList");
+    const newQuizButton = document.getElementById("newQuizButton");
+
+    function showNotice(element, message, type = "error") {
+        element.textContent = message;
+        element.className = "notice show " + type;
+    }
+
+    function hideNotice(element) {
+        element.className = "notice";
+        element.textContent = "";
+    }
+
+    function escapeHtml(value) {
+        const div = document.createElement("div");
+        div.textContent = value ?? "";
+        return div.innerHTML;
+    }
+
+    function formatDate(value) {
+        if (!value) {
+            return "";
+        }
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return "";
+        }
+
+        return date.toLocaleString();
+    }
+
+    async function apiFetch(url, options = {}) {
+        const response = await fetch(API_BASE + url, options);
+
+        let data = {};
+
+        try {
+            data = await response.json();
+        } catch {
+            data = {};
+        }
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail ||
+                data.error ||
+                "Something went wrong."
+            );
+        }
+
+        return data;
+    }
+
+    /* CONNECTION */
+
+    async function checkConnection() {
+        const status = document.getElementById("connectionStatus");
+
+        try {
+            await apiFetch("/");
+            status.textContent = "● Connected";
+        } catch {
+            status.textContent = "● Backend offline";
+        }
+    }
+
+    /* SESSIONS */
+
+    async function loadSessions() {
+        try {
+            const sessions = await apiFetch("/sessions");
+
+            renderSessions(sessions);
+
+            if (currentSessionId) {
+                const found = sessions.find(
+                    session => session.id === currentSessionId
+                );
+
+                if (found) {
+                    currentSession = found;
+                    updateCurrentSessionBox();
+                }
+            }
+        } catch (error) {
+            sessionList.innerHTML = `
+                <div class="memory-empty">
+                    Could not load Study Memory.
+                </div>
+            `;
+        }
+    }
+
+    function renderSessions(sessions) {
+
+        if (!sessions || sessions.length === 0) {
+            sessionList.innerHTML = `
+                <div class="memory-empty" style="grid-column:1/-1;">
+                    No study sessions yet.
+                    Start your first study session below.
+                </div>
+            `;
+            return;
+        }
+
+        sessionList.innerHTML = sessions.map(session => `
+            <div class="session-card">
+
+                <h3>${escapeHtml(session.subject)}</h3>
+
+                <div class="session-topic">
+                    ${escapeHtml(session.topic)}
+                </div>
+
+                <div class="session-meta">
+
+                    <span class="badge">
+                        ${escapeHtml(session.status || "Learning")}
+                    </span>
+
+                    <span class="session-date">
+                        ${escapeHtml(formatDate(session.updated_at))}
+                    </span>
+
+                </div>
+
+                <div class="session-actions">
+
+                    <button
+                        class="btn btn-primary"
+                        onclick="continueSession(${session.id})"
+                    >
+                        Continue
+                    </button>
+
+                    <button
+                        class="btn btn-danger"
+                        onclick="deleteSession(${session.id})"
+                    >
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+        `).join("");
+    }
+
+    async function continueSession(sessionId) {
+
+        try {
+            const session = await apiFetch(
+                "/sessions/" + sessionId
+            );
+
+            currentSessionId = session.id;
+            currentSession = session;
+
+            updateCurrentSessionBox();
+
+            chatBox.innerHTML = "";
+
+            if (!session.messages || session.messages.length === 0) {
+
+                addMessage(
+                    "assistant",
+                    "Welcome back! Let's continue studying " +
+                    session.topic + "."
+                );
+
+            } else {
+
+                for (const message of session.messages) {
+
+                    addMessage(
+                        message.role === "user"
+                            ? "user"
+                            : "assistant",
+                        message.content
+                    );
+
+                    if (message.role === "assistant") {
+                        lastAssistantAnswer = message.content;
+                    }
+                }
+            }
+
+            document
+                .getElementById("questionInput")
+                .focus();
+
+            window.scrollTo({
+                top: document
+                    .querySelector(".section:nth-of-type(3)")
+                    .offsetTop - 20,
+                behavior: "smooth"
+            });
+
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    async function deleteSession(sessionId) {
+
+        const confirmed = confirm(
+            "Delete this study session?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+
+            await apiFetch(
+                "/sessions/" + sessionId,
+                {
+                    method: "DELETE"
+                }
+            );
+
+            if (currentSessionId === sessionId) {
+                currentSessionId = null;
+                currentSession = null;
+
+                currentSessionBox.textContent =
+                    "No study session selected yet.";
+
+                chatBox.innerHTML = `
+                    <div class="message assistant">
+                        <div class="bubble">
+                            Hi! I'm Vaqelix, your AI study assistant.
+                            You can start a new study session anytime.
+                        </div>
+                    </div>
+                `;
+            }
+
+            await loadSessions();
+
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    window.continueSession = continueSession;
+    window.deleteSession = deleteSession;
+
+    function updateCurrentSessionBox() {
+
+        if (!currentSession) {
+            currentSessionBox.textContent =
+                "No study session selected yet.";
+            return;
+        }
+
+        currentSessionBox.textContent =
+            "Current study session: " +
+            currentSession.subject +
+            " — " +
+            currentSession.topic;
+    }
+
+    /* NEW STUDY */
+
+    newStudyButton.addEventListener("click", () => {
+        newStudyPanel.classList.toggle("active");
+
+        if (newStudyPanel.classList.contains("active")) {
+            subjectInput.focus();
+        }
+    });
+
+    createStudyButton.addEventListener("click", async () => {
+
+        const subject = subjectInput.value.trim();
+        const topic = topicInput.value.trim();
+        const notice = document.getElementById("newStudyNotice");
+
+        hideNotice(notice);
+
+        if (!subject || !topic) {
+            showNotice(
+                notice,
+                "Please enter both subject and topic."
+            );
+            return;
+        }
+
+        createStudyButton.disabled = true;
+        createStudyButton.textContent = "Creating...";
+
+        try {
+
+            const session = await apiFetch(
+                "/sessions",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        subject: subject,
+                        topic: topic
+                    })
+                }
+            );
+
+            currentSessionId = session.id;
+            currentSession = session;
+
+            updateCurrentSessionBox();
+
+            chatBox.innerHTML = "";
+
+            addMessage(
+                "assistant",
+                "Okay. Let's study " +
+                topic +
+                " in " +
+                subject +
+                ". What would you like to learn first?"
+            );
+
+            subjectInput.value = "";
+            topicInput.value = "";
+
+            showNotice(
+                notice,
+                "New study session created.",
+                "success"
+            );
+
+            await loadSessions();
+
+            document
+                .getElementById("questionInput")
+                .focus();
+
+        } catch (error) {
+
+            showNotice(
+                notice,
+                error.message
+            );
+
+        } finally {
+
+            createStudyButton.disabled = false;
+            createStudyButton.textContent = "Start Studying";
+        }
+    });
+
+    /* CHAT */
+
+    function addMessage(role, content) {
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "message " + role;
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+
+        bubble.textContent = content;
+
+        wrapper.appendChild(bubble);
+        chatBox.appendChild(wrapper);
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function saveMessage(role, content) {
+
+        if (!currentSessionId) {
+            return;
+        }
+
+        try {
+
+            await apiFetch(
+                "/sessions/" +
+                currentSessionId +
+                "/messages",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        role: role,
+                        content: content
+                    })
+                }
+            );
+
+        } catch {
+            /* Keep chat working even if saving fails. */
+        }
+    }
+
+    async function sendQuestion() {
+
+        const question = questionInput.value.trim();
+        const notice = document.getElementById("chatNotice");
+
+        hideNotice(notice);
+
+        if (!question) {
+            showNotice(
+                notice,
+                "Please enter a study question."
+            );
+            return;
+        }
+
+        if (!currentSessionId) {
+
+            showNotice(
+                notice,
+                "Please start or continue a study session first."
+            );
+
+            return;
+        }
+
+        addMessage("user", question);
+        questionInput.value = "";
+
+        await saveMessage("user", question);
+
+        sendButton.disabled = true;
+        sendButton.textContent = "Thinking...";
+
+        try {
+
+            const data = await apiFetch(
+                "/ask",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        session_id: currentSessionId
+                    })
+                }
+            );
+
+            const answer =
+                data.answer ||
+                "I could not generate an answer.";
+
+            lastAssistantAnswer = answer;
+
+            addMessage(
+                "assistant",
+                answer
+            );
+
+            await saveMessage(
+                "assistant",
+                answer
+            );
+
+            await loadSessions();
+
+        } catch (error) {
+
+            addMessage(
+                "assistant",
+                "Sorry, I could not answer that right now."
+            );
+
+            showNotice(
+                notice,
+                error.message
+            );
+
+        } finally {
+
+            sendButton.disabled = false;
+            sendButton.textContent = "Send";
+
+            questionInput.focus();
+        }
+    }
+
+    sendButton.addEventListener(
+        "click",
+        sendQuestion
+    );
+
+    questionInput.addEventListener(
+        "keydown",
+        event => {
+
+            if (
+                event.key === "Enter" &&
+                !event.shiftKey
+            ) {
+
+                event.preventDefault();
+                sendQuestion();
+            }
+        }
+    );
+
+    /* SIMPLIFY */
+
+    simplifyButton.addEventListener("click", async () => {
+
+        const notice =
+            document.getElementById("chatNotice");
+
+        hideNotice(notice);
+
+        if (!lastAssistantAnswer) {
+
+            showNotice(
+                notice,
+                "Ask Vaqelix something first."
+            );
+
+            return;
+        }
+
+        simplifyButton.disabled = true;
+        simplifyButton.textContent = "Simplifying...";
+
+        try {
+
+            const data = await apiFetch(
+                "/simplify",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        answer: lastAssistantAnswer
+                    })
+                }
+            );
+
+            const answer =
+                data.answer ||
+                "I could not simplify that answer.";
+
+            lastAssistantAnswer = answer;
+
+            addMessage(
+                "assistant",
+                answer
+            );
+
+            await saveMessage(
+                "assistant",
+                answer
+            );
+
+        } catch (error) {
+
+            showNotice(
+                notice,
+                error.message
+            );
+
+        } finally {
+
+            simplifyButton.disabled = false;
+            simplifyButton.textContent =
+                "✨ Explain Simpler";
+        }
+    });
+
+    /* UNDERSTAND */
+
+    understandButton.addEventListener("click", () => {
+
+        if (!currentSessionId) {
+            return;
+        }
+
+        addMessage(
+            "assistant",
+            "Great. When you're ready, you can practice the topic or take a quiz."
+        );
+
+        saveMessage(
+            "assistant",
+            "Student marked the topic as understood."
+        );
+    });
+
+    /* PRACTICE */
+
+    practiceButton.addEventListener("click", async () => {
+
+        const notice =
+            document.getElementById("practiceNotice");
+
+        hideNotice(notice);
+
+        practiceList.innerHTML = "";
+
+        if (!currentSession) {
+
+            showNotice(
+                notice,
+                "Please start or continue a study session first."
+            );
+
+            return;
+        }
+
+        practiceButton.disabled = true;
+        practiceButton.textContent = "Creating...";
+
+        try {
+
+            const data = await apiFetch(
+                "/practice",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        topic:
+                            currentSession.topic
+                    })
+                }
+            );
+
+            if (
+                data.error ||
+                !data.questions ||
+                data.questions.length === 0
+            ) {
+
+                throw new Error(
+                    data.error ||
+                    "No practice questions were created."
+                );
+            }
+
+            practiceList.innerHTML =
+                data.questions.map(
+                    (item, index) => `
+                        <div class="practice-item">
+                            <h4>
+                                ${index + 1}.
+                                ${escapeHtml(item.question)}
+                            </h4>
+
+                            <div class="practice-answer">
+                                Answer:
+                                ${escapeHtml(item.answer)}
+                            </div>
+                        </div>
+                    `
+                ).join("");
+
+        } catch (error) {
+
+            showNotice(
+                notice,
+                error.message
+            );
+
+        } finally {
+
+            practiceButton.disabled = false;
+            practiceButton.textContent =
+                "Create Practice Questions";
+        }
+    });
+
+    /* QUIZ SETUP */
+
+    openQuizButton.addEventListener("click", () => {
+
+        quizSection.scrollIntoView({
+            behavior: "smooth"
+        });
+
+    });
+
+    document.querySelectorAll(".count-btn")
+        .forEach(button => {
+
+            button.addEventListener("click", () => {
+
+                document
+                    .querySelectorAll(".count-btn")
+                    .forEach(btn =>
+                        btn.classList.remove("active")
+                    );
+
+                button.classList.add("active");
+
+                const value =
+                    button.dataset.count;
+
+                if (value === "custom") {
+
+                    selectedQuizCount = "custom";
+
+                    customCountBox.classList.add(
+                        "active"
+                    );
+
+                    customCountInput.focus();
+
+                } else {
+
+                    selectedQuizCount =
+                        Number(value);
+
+                    customCountBox.classList.remove(
+                        "active"
+                    );
+                }
+            });
+        });
+
+    /* START QUIZ */
+
+    startQuizButton.addEventListener(
+        "click",
+        async () => {
+
+            const notice =
+                document.getElementById("quizNotice");
+
+            hideNotice(notice);
+
+            if (!currentSession) {
+
+                showNotice(
+                    notice,
+                    "Please start or continue a study session first."
+                );
+
+                return;
+            }
+
+            let count =
+                selectedQuizCount;
+
+            if (count === "custom") {
+
+                count =
+                    Number(
+                        customCountInput.value
+                    );
+
+                if (
+                    !Number.isInteger(count) ||
+                    count < 1 ||
+                    count > 50
+                ) {
+
+                    showNotice(
+                        notice,
+                        "Custom question count must be between 1 and 50."
+                    );
+
+                    return;
+                }
+            }
+
+            const source =
+                quizSource.value;
+
+            let quizTopic =
+                currentSession.topic;
+
+            if (source === "material") {
+
+                const material =
+                    prompt(
+                        "Paste your study material here:"
+                    );
+
+                if (!material || !material.trim()) {
+                    return;
+                }
+
+                quizTopic =
+                    material.trim();
+            }
+
+            startQuizButton.disabled = true;
+            startQuizButton.textContent =
+                "Creating Quiz...";
+
+            try {
+
+                const data = await apiFetch(
+                    "/quiz",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            topic: quizTopic,
+                            question_count: count,
+                            source: source
+                        })
+                    }
+                );
+
+                if (
+                    data.error ||
+                    !data.quiz ||
+                    data.quiz.length === 0
+                ) {
+
+                    throw new Error(
+                        data.error ||
+                        "Could not create quiz."
+                    );
+                }
+
+                quizData = data.quiz;
+                quizAnswers =
+                    new Array(
+                        quizData.length
+                    ).fill(null);
+
+                currentQuizIndex = 0;
+
+                scoreBox.classList.remove(
+                    "active"
+                );
+
+                quizArea.classList.add(
+                    "active"
+                );
+
+                renderQuizQuestion();
+
+                quizArea.scrollIntoView({
+                    behavior: "smooth"
+                });
+
+            } catch (error) {
+
+                showNotice(
+                    notice,
+                    error.message
+                );
+
+            } finally {
+
+                startQuizButton.disabled = false;
+                startQuizButton.textContent =
+                    "Start Quiz";
+            }
+        }
+    );
+
+    /* QUIZ DISPLAY */
+
+    function renderQuizQuestion() {
+
+        const question =
+            quizData[currentQuizIndex];
+
+        if (!question) {
+            return;
+        }
+
+        const total =
+            quizData.length;
+
+        const number =
+            currentQuizIndex + 1;
+
+        quizProgress.textContent =
+            "Question " +
+            number +
+            " of " +
+            total;
+
+        progressFill.style.width =
+            ((number / total) * 100) +
+            "%";
+
+        quizQuestion.textContent =
+            question.question;
+
+        quizOptions.innerHTML = "";
+
+        ["A", "B", "C", "D"]
+            .forEach(letter => {
+
+                const button =
+                    document.createElement("button");
+
+                button.className =
+                    "option";
+
+                button.textContent =
+                    letter +
+                    ". " +
+                    question.options[letter];
+
+                if (
+                    quizAnswers[
+                        currentQuizIndex
+                    ] === letter
+                ) {
+
+                    button.classList.add(
+                        "selected"
+                    );
+                }
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        quizAnswers[
+                            currentQuizIndex
+                        ] = letter;
+
+                        document
+                            .querySelectorAll(".option")
+                            .forEach(
+                                option =>
+                                    option.classList.remove(
+                                        "selected"
+                                    )
+                            );
+
+                        button.classList.add(
+                            "selected"
+                        );
+                    }
+                );
+
+                quizOptions.appendChild(
+                    button
+                );
+            });
+
+        previousQuestionButton.disabled =
+            currentQuizIndex === 0;
+
+        nextQuestionButton.textContent =
+            currentQuizIndex === total - 1
+                ? "Finish Quiz"
+                : "Next";
+    }
+
+    previousQuestionButton.addEventListener(
+        "click",
+        () => {
+
+            if (currentQuizIndex > 0) {
+
+                currentQuizIndex--;
+                renderQuizQuestion();
+            }
+        }
+    );
+
+    nextQuestionButton.addEventListener(
+        "click",
+        () => {
+
+            if (
+                quizAnswers[
+                    currentQuizIndex
+                ] === null
+            ) {
+
+                alert(
+                    "Please select an answer first."
+                );
+
+                return;
+            }
+
+            if (
+                currentQuizIndex <
+                quizData.length - 1
+            ) {
+
+                currentQuizIndex++;
+                renderQuizQuestion();
+
+            } else {
+
+                finishQuiz();
+            }
+        }
+    );
+
+    /* SCORE */
+
+    function finishQuiz() {
+
+        let score = 0;
+
+        quizData.forEach(
+            (question, index) => {
+
+                if (
+                    quizAnswers[index] ===
+                    question.correct
+                ) {
+
+                    score++;
+                }
+            }
+        );
+
+        scoreNumber.textContent =
+            score +
+            "/" +
+            quizData.length;
+
+        const percentage =
+            Math.round(
+                (score / quizData.length) *
+                100
+            );
+
+        if (percentage >= 80) {
+
+            scoreMessage.textContent =
+                "Excellent understanding. Keep going!";
+
+        } else if (percentage >= 60) {
+
+            scoreMessage.textContent =
+                "Good work. Review the missed questions.";
+
+        } else {
+
+            scoreMessage.textContent =
+                "Keep practicing. You can improve your understanding.";
+        }
+
+        reviewList.innerHTML =
+            quizData.map(
+                (question, index) => {
+
+                    const userAnswer =
+                        quizAnswers[index];
+
+                    const correct =
+                        userAnswer ===
+                        question.correct;
+
+                    return `
+                        <div class="review-item ${correct ? "correct" : "wrong"}">
+
+                            <strong>
+                                ${index + 1}.
+                                ${escapeHtml(question.question)}
+                            </strong>
+
+                            <div class="review-answer">
+                                Your answer:
+                                ${escapeHtml(
+                                    userAnswer
+                                        ? question.options[userAnswer]
+                                        : "Not answered"
+                                )}
+                            </div>
+
+                            <div class="review-answer">
+                                Correct answer:
+                                ${escapeHtml(
+                                    question.options[
+                                        question.correct
+                                    ]
+                                )}
+                            </div>
+
+                        </div>
+                    `;
+                }
+            ).join("");
+
+        quizArea.classList.remove(
+            "active"
+        );
+
+        scoreBox.classList.add(
+            "active"
+        );
+
+        scoreBox.scrollIntoView({
+            behavior: "smooth"
+        });
+    }
+
+    newQuizButton.addEventListener(
+        "click",
+        () => {
+
+            scoreBox.classList.remove(
+                "active"
+            );
+
+            quizArea.classList.remove(
+                "active"
+            );
+
+            quizSection.scrollIntoView({
+                behavior: "smooth"
+            });
+        }
+    );
+
+    /* INITIALIZE */
+
+    checkConnection();
+    loadSessions();
+
+</script>
+
+</body>
+</html>
