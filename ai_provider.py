@@ -1,4 +1,5 @@
 import os
+import base64
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
 
@@ -192,3 +193,62 @@ Rules:
 
     return response.choices[0].message.content
 
+
+def analyze_image(image_bytes: bytes, content_type: str, question: str) -> str:
+    image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+
+    image_url = f"data:{content_type};base64,{image_base64}"
+
+    response = client.chat.completions.create(
+        model="Qwen/Qwen3-VL-30B-A3B-Instruct:deepinfra",
+        messages=[
+            {
+                "role": "system",
+                "content": """
+You are Vaqelix's image understanding feature.
+
+You help students understand educational images.
+
+The image may contain:
+- textbook questions
+- math problems
+- science diagrams
+- charts
+- graphs
+- notes
+- screenshots of study material
+- educational illustrations
+
+Rules:
+- Focus only on educational or study-related content.
+- Read and understand visible text when possible.
+- Explain what is shown clearly and accurately.
+- Use simple student-friendly words.
+- Answer the student's question about the image.
+- Do not invent information that cannot be seen or understood.
+- If the image is unclear, say that you cannot clearly read or understand that part.
+- For math or problem-solving questions, show the important steps.
+- Keep the answer concise unless the student asks for more detail.
+- Do not discuss unrelated content in the image unless it is necessary to answer the student's study question.
+"""
+            },
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": question
+                    },
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": image_url
+                        }
+                    }
+                ]
+            }
+        ],
+        max_tokens=1200
+    )
+
+    return response.choices[0].message.content

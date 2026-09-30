@@ -69,6 +69,12 @@ class StudySession(Base):
         cascade="all, delete-orphan"
     )
 
+    study_materials = relationship(
+        "StudyMaterial",
+        back_populates="study_session",
+        cascade="all, delete-orphan"
+    )
+
 
 class Message(Base):
 
@@ -107,7 +113,49 @@ class Message(Base):
     )
 
 
+class StudyMaterial(Base):
+
+    __tablename__ = "study_materials"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    session_id = Column(
+        Integer,
+        ForeignKey("study_sessions.id"),
+        nullable=False
+    )
+
+    title = Column(
+        String(200),
+        nullable=False
+    )
+
+    content = Column(
+        Text,
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+    study_session = relationship(
+        "StudySession",
+        back_populates="study_materials"
+    )
+
+
 Base.metadata.create_all(
     bind=engine
 )
-

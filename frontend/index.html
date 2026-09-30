@@ -6,701 +6,454 @@
 
     <title>Vaqelix - AI Study Assistant</title>
 
+    <link rel="icon" type="image/jpeg" href="vaqelix6.jpg">
+
     <style>
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --dark-blue: #123b66;
-            --deep-blue: #0b2f52;
-            --sky-blue: #4db8ff;
-            --light-blue: #eaf7ff;
-            --white: #ffffff;
-            --text: #17324d;
-            --muted: #6c7f91;
-            --border: #d9e8f2;
-            --danger: #c0392b;
-            --success: #16845b;
-            --shadow: 0 10px 30px rgba(18, 59, 102, 0.10);
         }
 
         body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f6fbff;
-            color: var(--text);
-            line-height: 1.5;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eaf7ff;
+            color: #102a43;
         }
 
-        button,
-        input,
-        textarea,
-        select {
-            font: inherit;
-        }
-
-        button {
-            cursor: pointer;
-        }
-
-        .app {
-            min-height: 100vh;
-        }
-
-        /* HEADER */
-
-        .header {
-            background: linear-gradient(135deg, var(--deep-blue), var(--dark-blue));
+        header {
+            background: #0b2f52;
             color: white;
-            padding: 18px 24px;
-            box-shadow: 0 4px 18px rgba(11, 47, 82, 0.18);
+            padding: 18px 30px;
         }
 
         .header-inner {
-            max-width: 1150px;
+            max-width: 1100px;
             margin: auto;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .brand-mark {
-            width: 46px;
-            height: 46px;
-            border-radius: 14px;
-            background: var(--sky-blue);
-            color: var(--deep-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 20px;
-        }
-
-        .brand h1 {
-            font-size: 25px;
-        }
-
-        .brand p {
-            color: #dcefff;
-            font-size: 13px;
-        }
-
-        .status-pill {
-            padding: 8px 13px;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.18);
-            font-size: 13px;
-        }
-
-        /* MAIN */
-
-        main {
-            max-width: 1150px;
-            margin: 0 auto;
-            padding: 30px 20px 60px;
-        }
-
-        .hero {
-            background: linear-gradient(135deg, var(--white), var(--light-blue));
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 28px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow);
-        }
-
-        .hero h2 {
-            color: var(--deep-blue);
-            font-size: 30px;
-            margin-bottom: 8px;
-        }
-
-        .hero p {
-            color: var(--muted);
-            max-width: 720px;
-        }
-
-        .section {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow);
-        }
-
-        .section-title {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .section-title h2 {
-            color: var(--deep-blue);
-            font-size: 22px;
-        }
-
-        .section-title p {
-            color: var(--muted);
-            font-size: 14px;
-            margin-top: 3px;
-        }
-
-        /* MEMORY */
-
-        .memory-empty {
-            padding: 20px;
-            border: 1px dashed var(--border);
-            border-radius: 14px;
-            color: var(--muted);
-            text-align: center;
-        }
-
-        .session-list {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
             gap: 15px;
         }
 
-        .session-card {
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 18px;
-            background: #fbfdff;
-            transition: 0.2s ease;
+        .logo {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 12px;
+            background: white;
         }
 
-        .session-card:hover {
-            transform: translateY(-2px);
-            border-color: var(--sky-blue);
+        .brand h1 {
+            margin: 0;
+            font-size: 28px;
         }
 
-        .session-card h3 {
-            color: var(--dark-blue);
-            margin-bottom: 4px;
-        }
-
-        .session-topic {
-            color: var(--muted);
+        .brand p {
+            margin: 4px 0 0;
             font-size: 14px;
-            margin-bottom: 12px;
+            opacity: 0.9;
         }
 
-        .session-meta {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            margin-bottom: 14px;
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 30px 20px;
         }
 
-        .badge {
-            display: inline-block;
-            padding: 5px 9px;
-            border-radius: 999px;
-            background: var(--light-blue);
-            color: var(--dark-blue);
-            font-size: 12px;
-            font-weight: 700;
+        .hero,
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
         }
 
-        .session-date {
-            color: var(--muted);
-            font-size: 12px;
+        .hero {
+            text-align: center;
+            padding: 35px;
         }
 
-        .session-actions {
-            display: flex;
-            gap: 8px;
+        .hero h2 {
+            color: #0b2f52;
+            font-size: 32px;
+            margin-top: 0;
         }
 
-        /* BUTTONS */
-
-        .btn {
-            border: none;
-            border-radius: 11px;
-            padding: 11px 15px;
-            font-weight: 700;
-            transition: 0.2s ease;
+        .hero p {
+            color: #486581;
+            line-height: 1.6;
+            font-size: 17px;
         }
 
-        .btn-primary {
-            background: var(--sky-blue);
-            color: var(--deep-blue);
+        .section h2 {
+            color: #0b2f52;
+            margin-top: 0;
         }
 
-        .btn-primary:hover {
-            background: #2da9f5;
+        .section h3 {
+            color: #0b2f52;
         }
 
-        .btn-dark {
-            background: var(--dark-blue);
-            color: white;
-        }
-
-        .btn-dark:hover {
-            background: var(--deep-blue);
-        }
-
-        .btn-danger {
-            background: #fff0ef;
-            color: var(--danger);
-            border: 1px solid #ffd8d4;
-        }
-
-        .btn-light {
-            background: var(--light-blue);
-            color: var(--dark-blue);
-        }
-
-        .btn:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-        }
-
-        /* NEW STUDY */
-
-        .new-study-panel {
-            display: none;
-            margin-top: 18px;
-            padding: 18px;
-            background: var(--light-blue);
-            border-radius: 15px;
-            border: 1px solid var(--border);
-        }
-
-        .new-study-panel.active {
-            display: block;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 12px;
-            align-items: end;
+        .form-group {
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
-            color: var(--dark-blue);
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 6px;
+            font-weight: bold;
+            margin-bottom: 7px;
         }
 
         input,
         textarea,
         select {
             width: 100%;
-            border: 1px solid var(--border);
-            border-radius: 11px;
-            padding: 12px 13px;
-            background: white;
-            color: var(--text);
+            padding: 12px;
+            border: 1px solid #c9d6e2;
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 15px;
             outline: none;
         }
 
         input:focus,
         textarea:focus,
         select:focus {
-            border-color: var(--sky-blue);
-            box-shadow: 0 0 0 3px rgba(77,184,255,0.15);
+            border-color: #4db8ff;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 9px;
+            padding: 11px 17px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 7px;
+            margin-bottom: 7px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-dark {
+            background: #0b2f52;
+            color: white;
+        }
+
+        .btn-blue {
+            background: #168dcc;
+            color: white;
+        }
+
+        .btn-light {
+            background: #eaf7ff;
+            color: #0b2f52;
+        }
+
+        .btn-danger {
+            background: #d9534f;
+            color: white;
+        }
+
+        .notice {
+            display: none;
+            margin-top: 12px;
+            padding: 11px;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        .notice.success {
+            display: block;
+            background: #e8f7ef;
+            color: #176b3a;
+        }
+
+        .notice.error {
+            display: block;
+            background: #fdecec;
+            color: #a33a3a;
+        }
+
+        /* SESSION */
+
+        .session-create {
+            background: #f5fbff;
+            border: 1px solid #d6e8f5;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .session-card {
+            background: #f8fbfe;
+            border: 1px solid #d6e2ed;
+            border-radius: 12px;
+            padding: 17px;
+            margin-top: 12px;
+        }
+
+        .session-card.current {
+            border: 2px solid #168dcc;
+            background: #eef9ff;
+        }
+
+        .session-card h3 {
+            margin: 0 0 7px;
+        }
+
+        .session-card p {
+            margin: 5px 0;
+            color: #486581;
+        }
+
+        .session-actions {
+            margin-top: 12px;
+        }
+
+        .current-session {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 9px;
+            background: #eaf7ff;
+            color: #0b2f52;
+            font-weight: bold;
         }
 
         /* CHAT */
 
-        .current-session {
-            background: var(--light-blue);
-            color: var(--dark-blue);
-            border-radius: 11px;
-            padding: 10px 13px;
-            margin-bottom: 16px;
-            font-size: 14px;
-            font-weight: 700;
-        }
-
         .chat-box {
-            height: 430px;
+            background: #f4f9fd;
+            border: 1px solid #d6e2ed;
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 18px;
+            min-height: 150px;
+            max-height: 520px;
             overflow-y: auto;
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 16px;
-            background: #fafdff;
-            margin-bottom: 14px;
         }
 
-        .message {
+        .chat-message {
             display: flex;
-            margin-bottom: 14px;
+            width: 100%;
+            margin-bottom: 16px;
         }
 
-        .message.user {
+        .chat-message.user {
             justify-content: flex-end;
         }
 
-        .bubble {
+        .chat-message.assistant {
+            justify-content: flex-start;
+        }
+
+        .chat-bubble {
             max-width: 78%;
-            padding: 12px 15px;
-            border-radius: 15px;
+            padding: 13px 16px;
+            border-radius: 16px;
+            line-height: 1.6;
             white-space: pre-wrap;
-            word-break: break-word;
+            word-wrap: break-word;
         }
 
-        .message.user .bubble {
-            background: var(--dark-blue);
+        .chat-message.user .chat-bubble {
+            background: #168dcc;
             color: white;
-            border-bottom-right-radius: 4px;
+            border-bottom-right-radius: 5px;
         }
 
-        .message.assistant .bubble {
+        .chat-message.assistant .chat-bubble {
             background: white;
-            color: var(--text);
-            border: 1px solid var(--border);
-            border-bottom-left-radius: 4px;
+            color: #102a43;
+            border: 1px solid #d6e2ed;
+            border-left: 5px solid #168dcc;
+            border-bottom-left-radius: 5px;
         }
 
-        .chat-input-row {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 10px;
+        .chat-label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
 
-        .chat-input-row textarea {
-            min-height: 52px;
-            resize: vertical;
+        .chat-message.assistant .chat-label {
+            color: #0b2f52;
         }
 
-        .chat-tools {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 9px;
+        .chat-message.user .chat-label {
+            color: white;
+        }
+
+        .chat-empty {
+            text-align: center;
+            color: #6b7c93;
+            padding: 30px 10px;
+        }
+
+        .answer-actions {
+            display: none;
+            margin-top: 15px;
+        }
+
+        /* MATERIALS */
+
+        .upload-box {
+            background: #f8fbfe;
+            border: 1px solid #d6e2ed;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 18px;
+        }
+
+        .material-card {
+            background: #f8fbfe;
+            border: 1px solid #d6e2ed;
+            border-radius: 12px;
+            padding: 17px;
             margin-top: 12px;
         }
 
-        /* CARDS */
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px;
+        .material-card h3 {
+            margin-top: 0;
         }
 
-        .feature-card {
-            border: 1px solid var(--border);
-            border-radius: 17px;
-            padding: 20px;
-            background: #fbfdff;
-        }
-
-        .feature-card h3 {
-            color: var(--dark-blue);
-            margin-bottom: 6px;
-        }
-
-        .feature-card p {
-            color: var(--muted);
-            font-size: 14px;
-            margin-bottom: 16px;
-        }
-
-        /* QUIZ */
-
-        .quiz-settings {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .count-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .count-btn {
-            border: 1px solid var(--border);
-            background: white;
-            color: var(--dark-blue);
-            border-radius: 10px;
-            padding: 10px 15px;
-            font-weight: 700;
-        }
-
-        .count-btn.active {
-            background: var(--sky-blue);
-            border-color: var(--sky-blue);
-            color: var(--deep-blue);
-        }
-
-        .custom-count {
-            margin-top: 10px;
-            display: none;
-        }
-
-        .custom-count.active {
-            display: block;
-        }
-
-        .quiz-area {
-            display: none;
-            margin-top: 20px;
-        }
-
-        .quiz-area.active {
-            display: block;
-        }
-
-        .quiz-progress {
-            color: var(--muted);
-            font-size: 14px;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 9px;
-            background: #e6f0f7;
-            border-radius: 99px;
+        .material-preview {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #334e68;
+            max-height: 250px;
             overflow: hidden;
-            margin-bottom: 18px;
         }
 
-        .progress-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--sky-blue);
-            transition: width 0.25s ease;
+        .material-actions {
+            margin-top: 12px;
         }
 
-        .quiz-question {
-            font-size: 22px;
-            color: var(--deep-blue);
-            font-weight: 800;
-            margin-bottom: 18px;
-        }
-
-        .options {
-            display: grid;
-            gap: 10px;
-        }
-
-        .option {
-            width: 100%;
-            text-align: left;
-            border: 1px solid var(--border);
-            background: white;
-            border-radius: 13px;
-            padding: 14px;
-            color: var(--text);
-        }
-
-        .option:hover {
-            border-color: var(--sky-blue);
-            background: #f5fbff;
-        }
-
-        .option.selected {
-            border-color: var(--sky-blue);
-            background: var(--light-blue);
-        }
-
-        .quiz-actions {
-            margin-top: 18px;
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .score-box {
-            display: none;
-            text-align: center;
-            padding: 25px;
-            background: var(--light-blue);
-            border-radius: 17px;
-            margin-top: 20px;
-        }
-
-        .score-box.active {
-            display: block;
-        }
-
-        .score-number {
-            font-size: 48px;
-            font-weight: 900;
-            color: var(--dark-blue);
-        }
-
-        .review-list {
-            margin-top: 20px;
-            display: grid;
-            gap: 12px;
-        }
-
-        .review-item {
-            padding: 15px;
-            border-radius: 13px;
-            border: 1px solid var(--border);
-            background: white;
-        }
-
-        .review-item.correct {
-            border-left: 5px solid var(--success);
-        }
-
-        .review-item.wrong {
-            border-left: 5px solid var(--danger);
-        }
-
-        .review-item strong {
-            display: block;
-            color: var(--dark-blue);
-            margin-bottom: 7px;
-        }
-
-        .review-answer {
-            font-size: 14px;
-            color: var(--muted);
+        .image-result {
+            margin-top: 15px;
         }
 
         /* PRACTICE */
 
-        .practice-list {
-            display: grid;
-            gap: 12px;
-            margin-top: 16px;
+        .practice-result {
+            background: #f4f9fd;
+            border-left: 5px solid #168dcc;
+            padding: 18px;
+            border-radius: 10px;
+            margin-top: 18px;
+            line-height: 1.7;
         }
 
-        .practice-item {
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 16px;
-            background: #fbfdff;
+        .practice-question {
+            background: white;
+            border: 1px solid #d6e2ed;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
         }
 
-        .practice-item h4 {
-            color: var(--dark-blue);
-            margin-bottom: 7px;
+        /* QUIZ */
+
+        .quiz-question {
+            border: 1px solid #d6e2ed;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 15px;
+            background: #f8fbfe;
         }
 
-        .practice-answer {
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        /* STATUS */
-
-        .notice {
-            padding: 12px 14px;
-            border-radius: 11px;
-            margin-top: 12px;
-            display: none;
-            font-size: 14px;
-        }
-
-        .notice.show {
+        .quiz-option {
             display: block;
+            background: white;
+            border: 1px solid #d6e2ed;
+            border-radius: 8px;
+            padding: 11px;
+            margin: 9px 0;
+            cursor: pointer;
         }
 
-        .notice.error {
-            background: #fff0ef;
-            color: #9e2d22;
+        .quiz-option:hover {
+            border-color: #168dcc;
         }
 
-        .notice.success {
-            background: #edfaf4;
-            color: #16704f;
+        .quiz-result {
+            display: none;
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 10px;
+            background: #e8f7ef;
+            color: #176b3a;
         }
 
-        .loading {
-            color: var(--muted);
-            text-align: center;
-            padding: 20px;
+        /* MODALS */
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 25px 15px;
+            overflow-y: auto;
         }
 
-        /* FOOTER */
+        .modal-content {
+            max-width: 700px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 18px;
+            top: 10px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #486581;
+        }
 
         footer {
+            background: #0b2f52;
+            color: white;
             text-align: center;
-            color: var(--muted);
-            padding: 20px;
-            font-size: 13px;
+            padding: 22px;
         }
 
-        /* RESPONSIVE */
-
-        @media (max-width: 900px) {
-            .session-list {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
+        footer p {
+            margin: 4px;
         }
 
         @media (max-width: 700px) {
-            .header {
+            header {
                 padding: 15px;
             }
 
-            .header-inner {
-                align-items: flex-start;
+            .container {
+                padding: 20px 12px;
             }
 
-            .status-pill {
-                display: none;
-            }
-
-            main {
-                padding: 20px 12px 40px;
-            }
-
-            .hero {
-                padding: 21px;
+            .hero,
+            .section {
+                padding: 20px;
             }
 
             .hero h2 {
-                font-size: 25px;
+                font-size: 26px;
             }
 
-            .section {
-                padding: 17px;
-                border-radius: 16px;
-            }
-
-            .session-list,
-            .feature-grid,
-            .quiz-settings {
-                grid-template-columns: 1fr;
-            }
-
-            .chat-box {
-                height: 380px;
-            }
-
-            .bubble {
+            .chat-bubble {
                 max-width: 90%;
-            }
-
-            .chat-input-row {
-                grid-template-columns: 1fr;
-            }
-
-            .quiz-question {
-                font-size: 19px;
             }
         }
     </style>
@@ -708,635 +461,945 @@
 
 <body>
 
-<div class="app">
+<header>
+    <div class="header-inner">
 
-    <header class="header">
-        <div class="header-inner">
-            <div class="brand">
-                <div class="brand-mark">V</div>
-                <div>
-                    <h1>Vaqelix</h1>
-                    <p>Your AI Study Assistant</p>
-                </div>
-            </div>
+        <img
+            src="vaqelix6.jpg"
+            alt="Vaqelix Logo"
+            class="logo"
+        >
 
-            <div class="status-pill" id="connectionStatus">
-                Connecting...
-            </div>
+        <div class="brand">
+            <h1>Vaqelix</h1>
+            <p>Your AI Study Assistant</p>
         </div>
-    </header>
 
-    <main>
+    </div>
+</header>
 
-        <section class="hero">
-            <h2>Welcome back!</h2>
+
+<div class="container">
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <h2>Study Smarter with Vaqelix 🎓</h2>
+
+        <p>
+            Understand difficult topics, ask study questions,
+            use your own study material, practice, and test your knowledge.
+        </p>
+
+    </section>
+
+
+    <!-- STUDY MEMORY -->
+
+    <section class="section">
+
+        <h2>🧠 Study Memory</h2>
+
+        <div class="session-create">
+
+            <h3>Start Something New</h3>
+
+            <div class="form-group">
+
+                <label for="sessionSubject">
+                    Subject
+                </label>
+
+                <input
+                    id="sessionSubject"
+                    type="text"
+                    placeholder="e.g. Biology"
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="sessionTopic">
+                    Topic
+                </label>
+
+                <input
+                    id="sessionTopic"
+                    type="text"
+                    placeholder="e.g. Photosynthesis"
+                >
+
+            </div>
+
+            <button
+                class="btn btn-dark"
+                id="newSessionButton"
+            >
+                ➕ New Study Session
+            </button>
+
+        </div>
+
+
+        <button
+            class="btn btn-light"
+            id="loadSessionsButton"
+        >
+            🔄 Load Sessions
+        </button>
+
+
+        <div
+            id="sessionNotice"
+            class="notice"
+        ></div>
+
+
+        <div id="sessionsList"></div>
+
+
+        <div
+            class="current-session"
+            id="currentSessionText"
+        >
+            No study session selected.
+        </div>
+
+    </section>
+
+
+    <!-- STUDY MATERIAL -->
+
+    <section class="section">
+
+        <h2>📚 Study Material</h2>
+
+        <div class="form-group">
+
+            <label for="materialTitle">
+                Material Title
+            </label>
+
+            <input
+                id="materialTitle"
+                type="text"
+                placeholder="e.g. Photosynthesis Notes"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="materialContent">
+                Material Content
+            </label>
+
+            <textarea
+                id="materialContent"
+                placeholder="Paste your study material here..."
+            ></textarea>
+
+        </div>
+
+
+        <button
+            class="btn btn-dark"
+            id="saveMaterialButton"
+        >
+            💾 Save Material
+        </button>
+
+
+        <button
+            class="btn btn-light"
+            id="loadMaterialsButton"
+        >
+            🔄 Load Saved Materials
+        </button>
+
+
+        <div
+            id="materialNotice"
+            class="notice"
+        ></div>
+
+
+        <!-- PDF -->
+
+        <div class="upload-box">
+
+            <h3>📄 Upload PDF</h3>
+
             <p>
-                Learn, understand, practice, and test yourself with Vaqelix.
-                Your study sessions stay organized so you can continue learning later.
+                Upload a PDF and Vaqelix will extract
+                its readable text as study material.
             </p>
-        </section>
 
-        <!-- STUDY MEMORY -->
+            <input
+                type="file"
+                id="pdfFile"
+                accept=".pdf,application/pdf"
+            >
 
-        <section class="section">
-            <div class="section-title">
-                <div>
-                    <h2>📚 Study Memory</h2>
-                    <p>Continue previous studies or start something completely new.</p>
-                </div>
+            <br><br>
+
+            <button
+                class="btn btn-blue"
+                id="uploadPdfButton"
+            >
+                📤 Upload PDF
+            </button>
+
+            <div
+                id="pdfNotice"
+                class="notice"
+            ></div>
+
+        </div>
+
+
+        <!-- IMAGE -->
+
+        <div class="upload-box">
+
+            <h3>🖼️ Upload Study Image</h3>
+
+            <p>
+                Upload a study image and Vaqelix will
+                understand and explain its educational content.
+            </p>
+
+            <div class="form-group">
+
+                <label for="imageFile">
+                    Choose Image
+                </label>
+
+                <input
+                    type="file"
+                    id="imageFile"
+                    accept="image/jpeg,image/png,image/webp"
+                >
+
             </div>
 
-            <div id="sessionList" class="session-list">
-                <div class="loading">Loading your study memory...</div>
-            </div>
 
-            <div style="margin-top:18px;">
-                <button class="btn btn-primary" id="newStudyButton">
-                    ➕ Start Something New
-                </button>
-            </div>
+            <div class="form-group">
 
-            <div class="new-study-panel" id="newStudyPanel">
-                <div class="form-grid">
-                    <div>
-                        <label for="subjectInput">Subject</label>
-                        <input
-                            id="subjectInput"
-                            type="text"
-                            placeholder="e.g. Physics"
-                        >
-                    </div>
+                <label for="imageQuestion">
+                    Optional Question
+                </label>
 
-                    <div>
-                        <label for="topicInput">Topic</label>
-                        <input
-                            id="topicInput"
-                            type="text"
-                            placeholder="e.g. Motion"
-                        >
-                    </div>
-
-                    <button class="btn btn-dark" id="createStudyButton">
-                        Start Studying
-                    </button>
-                </div>
-
-                <div class="notice" id="newStudyNotice"></div>
-            </div>
-        </section>
-
-        <!-- ASK VAQELIX -->
-
-        <section class="section">
-            <div class="section-title">
-                <div>
-                    <h2>🧠 Ask Vaqelix</h2>
-                    <p>Ask a study question and learn through conversation.</p>
-                </div>
-            </div>
-
-            <div class="current-session" id="currentSessionBox">
-                No study session selected yet.
-            </div>
-
-            <div class="chat-box" id="chatBox">
-                <div class="message assistant">
-                    <div class="bubble">
-                        Hi! I'm Vaqelix, your AI study assistant.
-
-                        You can ask me a study question or tell me what you want to study.
-                    </div>
-                </div>
-            </div>
-
-            <div class="chat-input-row">
                 <textarea
-                    id="questionInput"
-                    placeholder="Ask Vaqelix a study question..."
+                    id="imageQuestion"
+                    placeholder="Ask something about this image..."
                 ></textarea>
 
-                <button class="btn btn-primary" id="sendButton">
-                    Send
-                </button>
             </div>
 
-            <div class="chat-tools">
-                <button class="btn btn-light" id="simplifyButton">
-                    ✨ Explain Simpler
-                </button>
 
-                <button class="btn btn-dark" id="understandButton">
-                    I Understand It
-                </button>
-            </div>
+            <button
+                class="btn btn-blue"
+                id="uploadImageButton"
+            >
+                🖼️ Understand Image
+            </button>
 
-            <div class="notice" id="chatNotice"></div>
-        </section>
 
-        <!-- PRACTICE + QUIZ -->
+            <div
+                id="imageNotice"
+                class="notice"
+            ></div>
 
-        <section class="section">
-            <div class="feature-grid">
 
-                <div class="feature-card">
-                    <h3>📝 Practice Questions</h3>
-                    <p>
-                        Create short practice questions to help you understand
-                        and review the current topic.
-                    </p>
+            <div id="imageResult"></div>
 
-                    <button class="btn btn-primary" id="practiceButton">
-                        Create Practice Questions
-                    </button>
+        </div>
 
-                    <div class="notice" id="practiceNotice"></div>
 
-                    <div id="practiceList" class="practice-list"></div>
-                </div>
+        <div id="studyMaterialsList"></div>
 
-                <div class="feature-card">
-                    <h3>🎯 Quiz Me</h3>
-                    <p>
-                        Test your understanding with a multiple-choice quiz.
-                    </p>
+    </section>
 
-                    <button class="btn btn-dark" id="openQuizButton">
-                        Set Up Quiz
-                    </button>
-                </div>
 
-            </div>
-        </section>
+    <!-- ASK VAQELIX -->
 
-        <!-- QUIZ -->
+    <section class="section">
 
-        <section class="section" id="quizSection">
+        <h2>🤖 Ask Vaqelix</h2>
 
-            <div class="section-title">
-                <div>
-                    <h2>🎯 Quiz Me</h2>
-                    <p>Choose the quiz source and number of questions.</p>
-                </div>
-            </div>
+        <div class="form-group">
 
-            <div class="quiz-settings">
+            <label for="questionInput">
+                Your Study Question
+            </label>
 
-                <div>
-                    <label>Quiz Source</label>
+            <textarea
+                id="questionInput"
+                placeholder="Ask Vaqelix a study-related question..."
+            ></textarea>
 
-                    <select id="quizSource">
-                        <option value="topic">By Topic</option>
-                        <option value="material">From My Study Material</option>
-                    </select>
-                </div>
+        </div>
 
-                <div>
-                    <label>Number of Questions</label>
 
-                    <div class="count-options">
+        <button
+            class="btn btn-dark"
+            id="askButton"
+        >
+            ✨ Ask Vaqelix
+        </button>
 
-                        <button class="count-btn" data-count="3">3</button>
-                        <button class="count-btn active" data-count="5">5</button>
-                        <button class="count-btn" data-count="10">10</button>
-                        <button class="count-btn" data-count="15">15</button>
-                        <button class="count-btn" data-count="20">20</button>
-                        <button class="count-btn" data-count="custom">Custom</button>
 
-                    </div>
+        <div
+            id="askNotice"
+            class="notice"
+        ></div>
 
-                    <div class="custom-count" id="customCountBox">
-                        <input
-                            id="customCountInput"
-                            type="number"
-                            min="1"
-                            max="50"
-                            placeholder="Enter number of questions"
-                        >
-                    </div>
-                </div>
 
-            </div>
+        <div
+            id="chatBox"
+            class="chat-box"
+        ></div>
 
-            <div style="margin-top:18px;">
-                <button class="btn btn-primary" id="startQuizButton">
-                    Start Quiz
-                </button>
-            </div>
 
-            <div class="notice" id="quizNotice"></div>
+        <div
+            id="answerActions"
+            class="answer-actions"
+        >
 
-            <div class="quiz-area" id="quizArea">
+            <button
+                class="btn btn-blue"
+                id="simplifyButton"
+            >
+                💡 Explain Simpler
+            </button>
 
-                <div class="quiz-progress" id="quizProgress">
-                    Question 1
-                </div>
+            <button
+                class="btn btn-light"
+                id="understandButton"
+            >
+                ✅ I Understand It
+            </button>
 
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
+        </div>
 
-                <div class="quiz-question" id="quizQuestion"></div>
+    </section>
 
-                <div class="options" id="quizOptions"></div>
 
-                <div class="quiz-actions">
-                    <button
-                        class="btn btn-light"
-                        id="previousQuestionButton"
-                        disabled
-                    >
-                        Previous
-                    </button>
+    <!-- PRACTICE -->
 
-                    <button class="btn btn-dark" id="nextQuestionButton">
-                        Next
-                    </button>
-                </div>
+    <section class="section">
 
-            </div>
+        <h2>✍️ Practice Questions</h2>
 
-            <div class="score-box" id="scoreBox">
+        <div class="form-group">
 
-                <div>Your Quiz Result</div>
+            <label for="practiceTopic">
+                Topic
+            </label>
 
-                <div class="score-number" id="scoreNumber">
-                    0/0
-                </div>
+            <input
+                id="practiceTopic"
+                type="text"
+                placeholder="e.g. Photosynthesis"
+            >
 
-                <div id="scoreMessage"></div>
+        </div>
 
-                <div class="review-list" id="reviewList"></div>
 
-                <div style="margin-top:18px;">
-                    <button class="btn btn-primary" id="newQuizButton">
-                        Take Another Quiz
-                    </button>
-                </div>
+        <button
+            class="btn btn-dark"
+            id="practiceButton"
+        >
+            ✍️ Generate Practice
+        </button>
 
-            </div>
 
-        </section>
+        <div
+            id="practiceNotice"
+            class="notice"
+        ></div>
 
-    </main>
 
-    <footer>
-        Vaqelix — Learn. Understand. Practice. Grow.
-    </footer>
+        <div
+            id="practiceResult"
+            class="practice-result"
+            style="display:none;"
+        ></div>
+
+    </section>
+
+
+    <!-- QUIZ -->
+
+    <section class="section">
+
+        <h2>📝 Quiz</h2>
+
+        <div class="form-group">
+
+            <label for="quizTopic">
+                Quiz Topic
+            </label>
+
+            <input
+                id="quizTopic"
+                type="text"
+                placeholder="e.g. Artificial Intelligence"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="quizCount">
+                Number of Questions
+            </label>
+
+            <select id="quizCount">
+
+                <option value="3">3</option>
+                <option value="5" selected>5</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="20">20</option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            class="btn btn-dark"
+            id="quizButton"
+        >
+            🧠 Start Quiz
+        </button>
+
+
+        <div
+            id="quizNotice"
+            class="notice"
+        ></div>
+
+
+        <div id="quizContainer"></div>
+
+
+        <button
+            class="btn btn-blue"
+            id="finishQuizButton"
+            style="display:none;"
+        >
+            ✅ Finish Quiz
+        </button>
+
+
+        <div id="quizResult"></div>
+
+    </section>
 
 </div>
 
+
+<!-- VIEW MATERIAL MODAL -->
+
+<div
+    id="viewMaterialModal"
+    class="modal"
+>
+
+    <div class="modal-content">
+
+        <span
+            id="closeViewMaterial"
+            class="close-modal"
+        >
+            &times;
+        </span>
+
+        <h2>📖 Study Material</h2>
+
+        <div id="viewMaterialContent"></div>
+
+    </div>
+
+</div>
+
+
+<!-- EDIT MATERIAL MODAL -->
+
+<div
+    id="editMaterialModal"
+    class="modal"
+>
+
+    <div class="modal-content">
+
+        <span
+            id="closeEditMaterial"
+            class="close-modal"
+        >
+            &times;
+        </span>
+
+        <h2>✏️ Edit Material</h2>
+
+
+        <div class="form-group">
+
+            <label for="editMaterialTitle">
+                Material Title
+            </label>
+
+            <input id="editMaterialTitle">
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="editMaterialContent">
+                Material Content
+            </label>
+
+            <textarea id="editMaterialContent"></textarea>
+
+        </div>
+
+
+        <button
+            class="btn btn-dark"
+            id="updateMaterialButton"
+        >
+            💾 Update Material
+        </button>
+
+
+        <div
+            id="editMaterialNotice"
+            class="notice"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<footer>
+
+    <p><strong>Vaqelix</strong> 🎓</p>
+    <p>Your AI Study Assistant</p>
+
+</footer>
+
+
 <script>
 
-    const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "http://127.0.0.1:8000";
 
-    let currentSessionId = null;
-    let currentSession = null;
-    let lastAssistantAnswer = "";
 
-    let selectedQuizCount = 5;
-    let quizData = [];
-    let quizAnswers = [];
-    let currentQuizIndex = 0;
+/* =========================
+   STATE
+========================= */
 
-    const sessionList = document.getElementById("sessionList");
-    const currentSessionBox = document.getElementById("currentSessionBox");
-    const chatBox = document.getElementById("chatBox");
-    const questionInput = document.getElementById("questionInput");
-    const sendButton = document.getElementById("sendButton");
-    const simplifyButton = document.getElementById("simplifyButton");
-    const understandButton = document.getElementById("understandButton");
+let currentSessionId = null;
+let currentAnswer = "";
 
-    const newStudyButton = document.getElementById("newStudyButton");
-    const newStudyPanel = document.getElementById("newStudyPanel");
-    const createStudyButton = document.getElementById("createStudyButton");
-    const subjectInput = document.getElementById("subjectInput");
-    const topicInput = document.getElementById("topicInput");
+let chatMessages = [];
 
-    const practiceButton = document.getElementById("practiceButton");
-    const practiceList = document.getElementById("practiceList");
+let studyMaterials = [];
+let editingMaterialId = null;
 
-    const openQuizButton = document.getElementById("openQuizButton");
-    const quizSection = document.getElementById("quizSection");
-    const quizSource = document.getElementById("quizSource");
-    const startQuizButton = document.getElementById("startQuizButton");
-    const customCountBox = document.getElementById("customCountBox");
-    const customCountInput = document.getElementById("customCountInput");
+let quizQuestions = [];
+let quizAnswers = {};
+let currentQuizIndex = 0;
 
-    const quizArea = document.getElementById("quizArea");
-    const quizProgress = document.getElementById("quizProgress");
-    const progressFill = document.getElementById("progressFill");
-    const quizQuestion = document.getElementById("quizQuestion");
-    const quizOptions = document.getElementById("quizOptions");
-    const previousQuestionButton = document.getElementById("previousQuestionButton");
-    const nextQuestionButton = document.getElementById("nextQuestionButton");
+/* =========================
+   ELEMENTS
+========================= */
 
-    const scoreBox = document.getElementById("scoreBox");
-    const scoreNumber = document.getElementById("scoreNumber");
-    const scoreMessage = document.getElementById("scoreMessage");
-    const reviewList = document.getElementById("reviewList");
-    const newQuizButton = document.getElementById("newQuizButton");
+const sessionSubject =
+    document.getElementById("sessionSubject");
 
-    function showNotice(element, message, type = "error") {
-        element.textContent = message;
-        element.className = "notice show " + type;
-    }
+const sessionTopic =
+    document.getElementById("sessionTopic");
 
-    function hideNotice(element) {
-        element.className = "notice";
-        element.textContent = "";
-    }
+const newSessionButton =
+    document.getElementById("newSessionButton");
 
-    function escapeHtml(value) {
-        const div = document.createElement("div");
-        div.textContent = value ?? "";
-        return div.innerHTML;
-    }
+const loadSessionsButton =
+    document.getElementById("loadSessionsButton");
 
-    function formatDate(value) {
-        if (!value) {
-            return "";
+const sessionNotice =
+    document.getElementById("sessionNotice");
+
+const sessionsList =
+    document.getElementById("sessionsList");
+
+const currentSessionText =
+    document.getElementById("currentSessionText");
+
+
+const materialTitle =
+    document.getElementById("materialTitle");
+
+const materialContent =
+    document.getElementById("materialContent");
+
+const saveMaterialButton =
+    document.getElementById("saveMaterialButton");
+
+const loadMaterialsButton =
+    document.getElementById("loadMaterialsButton");
+
+const materialNotice =
+    document.getElementById("materialNotice");
+
+const studyMaterialsList =
+    document.getElementById("studyMaterialsList");
+
+
+const pdfFile =
+    document.getElementById("pdfFile");
+
+const uploadPdfButton =
+    document.getElementById("uploadPdfButton");
+
+const pdfNotice =
+    document.getElementById("pdfNotice");
+
+
+const imageFile =
+    document.getElementById("imageFile");
+
+const imageQuestion =
+    document.getElementById("imageQuestion");
+
+const uploadImageButton =
+    document.getElementById("uploadImageButton");
+
+const imageNotice =
+    document.getElementById("imageNotice");
+
+const imageResult =
+    document.getElementById("imageResult");
+
+
+const questionInput =
+    document.getElementById("questionInput");
+
+const askButton =
+    document.getElementById("askButton");
+
+const askNotice =
+    document.getElementById("askNotice");
+
+const chatBox =
+    document.getElementById("chatBox");
+
+const answerActions =
+    document.getElementById("answerActions");
+
+const simplifyButton =
+    document.getElementById("simplifyButton");
+
+const understandButton =
+    document.getElementById("understandButton");
+
+
+const practiceTopic =
+    document.getElementById("practiceTopic");
+
+const practiceButton =
+    document.getElementById("practiceButton");
+
+const practiceNotice =
+    document.getElementById("practiceNotice");
+
+const practiceResult =
+    document.getElementById("practiceResult");
+
+
+const quizTopic =
+    document.getElementById("quizTopic");
+
+const quizCount =
+    document.getElementById("quizCount");
+
+const quizButton =
+    document.getElementById("quizButton");
+
+const quizNotice =
+    document.getElementById("quizNotice");
+
+const quizContainer =
+    document.getElementById("quizContainer");
+
+const finishQuizButton =
+    document.getElementById("finishQuizButton");
+
+const quizResult =
+    document.getElementById("quizResult");
+
+
+const viewMaterialModal =
+    document.getElementById("viewMaterialModal");
+
+const closeViewMaterial =
+    document.getElementById("closeViewMaterial");
+
+const viewMaterialContent =
+    document.getElementById("viewMaterialContent");
+
+
+const editMaterialModal =
+    document.getElementById("editMaterialModal");
+
+const closeEditMaterial =
+    document.getElementById("closeEditMaterial");
+
+const editMaterialTitle =
+    document.getElementById("editMaterialTitle");
+
+const editMaterialContent =
+    document.getElementById("editMaterialContent");
+
+const updateMaterialButton =
+    document.getElementById("updateMaterialButton");
+
+const editMaterialNotice =
+    document.getElementById("editMaterialNotice");
+
+
+/* =========================
+   HELPERS
+========================= */
+
+function showNotice(element, message, type = "error") {
+
+    element.textContent = message;
+    element.className = "notice " + type;
+    element.style.display = "block";
+}
+
+
+async function apiFetch(endpoint, options = {}) {
+
+    const config = {
+        ...options,
+        headers: {
+            ...(options.body instanceof FormData
+                ? {}
+                : {
+                    "Content-Type": "application/json"
+                }),
+            ...(options.headers || {})
         }
+    };
 
-        const date = new Date(value);
-
-        if (Number.isNaN(date.getTime())) {
-            return "";
-        }
-
-        return date.toLocaleString();
-    }
-
-    async function apiFetch(url, options = {}) {
-        const response = await fetch(API_BASE + url, options);
-
-        let data = {};
-
-        try {
-            data = await response.json();
-        } catch {
-            data = {};
-        }
-
-        if (!response.ok) {
-            throw new Error(
-                data.detail ||
-                data.error ||
-                "Something went wrong."
-            );
-        }
-
-        return data;
-    }
-
-    /* CONNECTION */
-
-    async function checkConnection() {
-        const status = document.getElementById("connectionStatus");
-
-        try {
-            await apiFetch("/");
-            status.textContent = "● Connected";
-        } catch {
-            status.textContent = "● Backend offline";
-        }
-    }
-
-    /* SESSIONS */
-
-    async function loadSessions() {
-        try {
-            const sessions = await apiFetch("/sessions");
-
-            renderSessions(sessions);
-
-            if (currentSessionId) {
-                const found = sessions.find(
-                    session => session.id === currentSessionId
-                );
-
-                if (found) {
-                    currentSession = found;
-                    updateCurrentSessionBox();
-                }
-            }
-        } catch (error) {
-            sessionList.innerHTML = `
-                <div class="memory-empty">
-                    Could not load Study Memory.
-                </div>
-            `;
-        }
-    }
-
-    function renderSessions(sessions) {
-
-        if (!sessions || sessions.length === 0) {
-            sessionList.innerHTML = `
-                <div class="memory-empty" style="grid-column:1/-1;">
-                    No study sessions yet.
-                    Start your first study session below.
-                </div>
-            `;
-            return;
-        }
-
-        sessionList.innerHTML = sessions.map(session => `
-            <div class="session-card">
-
-                <h3>${escapeHtml(session.subject)}</h3>
-
-                <div class="session-topic">
-                    ${escapeHtml(session.topic)}
-                </div>
-
-                <div class="session-meta">
-
-                    <span class="badge">
-                        ${escapeHtml(session.status || "Learning")}
-                    </span>
-
-                    <span class="session-date">
-                        ${escapeHtml(formatDate(session.updated_at))}
-                    </span>
-
-                </div>
-
-                <div class="session-actions">
-
-                    <button
-                        class="btn btn-primary"
-                        onclick="continueSession(${session.id})"
-                    >
-                        Continue
-                    </button>
-
-                    <button
-                        class="btn btn-danger"
-                        onclick="deleteSession(${session.id})"
-                    >
-                        Delete
-                    </button>
-
-                </div>
-
-            </div>
-        `).join("");
-    }
-
-    async function continueSession(sessionId) {
-
-        try {
-            const session = await apiFetch(
-                "/sessions/" + sessionId
-            );
-
-            currentSessionId = session.id;
-            currentSession = session;
-
-            updateCurrentSessionBox();
-
-            chatBox.innerHTML = "";
-
-            if (!session.messages || session.messages.length === 0) {
-
-                addMessage(
-                    "assistant",
-                    "Welcome back! Let's continue studying " +
-                    session.topic + "."
-                );
-
-            } else {
-
-                for (const message of session.messages) {
-
-                    addMessage(
-                        message.role === "user"
-                            ? "user"
-                            : "assistant",
-                        message.content
-                    );
-
-                    if (message.role === "assistant") {
-                        lastAssistantAnswer = message.content;
-                    }
-                }
-            }
-
-            document
-                .getElementById("questionInput")
-                .focus();
-
-            window.scrollTo({
-                top: document
-                    .querySelector(".section:nth-of-type(3)")
-                    .offsetTop - 20,
-                behavior: "smooth"
-            });
-
-        } catch (error) {
-            alert(error.message);
-        }
-    }
-
-    async function deleteSession(sessionId) {
-
-        const confirmed = confirm(
-            "Delete this study session?"
+    const response =
+        await fetch(
+            API_BASE + endpoint,
+            config
         );
 
-        if (!confirmed) {
-            return;
-        }
+    let data = {};
 
-        try {
+    try {
+        data = await response.json();
+    } catch {
+        data = {};
+    }
 
-            await apiFetch(
-                "/sessions/" + sessionId,
-                {
-                    method: "DELETE"
-                }
+    if (!response.ok) {
+
+        throw new Error(
+            data.detail ||
+            data.message ||
+            "Something went wrong."
+        );
+    }
+
+    return data;
+}
+
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent =
+        text == null ? "" : String(text);
+
+    return div.innerHTML;
+}
+
+
+/* =========================
+   CHAT
+========================= */
+
+function renderChatMessages() {
+
+    chatBox.innerHTML = "";
+
+    if (chatMessages.length === 0) {
+
+        const empty =
+            document.createElement("div");
+
+        empty.className =
+            "chat-empty";
+
+        empty.textContent =
+            "Ask Vaqelix a study question to start the chat. 🎓";
+
+        chatBox.appendChild(empty);
+
+        return;
+    }
+
+
+    chatMessages.forEach(function(message) {
+
+        const row =
+            document.createElement("div");
+
+        row.className =
+            "chat-message " +
+            (
+                message.role === "user"
+                    ? "user"
+                    : "assistant"
             );
 
-            if (currentSessionId === sessionId) {
-                currentSessionId = null;
-                currentSession = null;
 
-                currentSessionBox.textContent =
-                    "No study session selected yet.";
+        const bubble =
+            document.createElement("div");
 
-                chatBox.innerHTML = `
-                    <div class="message assistant">
-                        <div class="bubble">
-                            Hi! I'm Vaqelix, your AI study assistant.
-                            You can start a new study session anytime.
-                        </div>
-                    </div>
-                `;
-            }
+        bubble.className =
+            "chat-bubble";
 
-            await loadSessions();
 
-        } catch (error) {
-            alert(error.message);
-        }
-    }
+        const label =
+            document.createElement("div");
 
-    window.continueSession = continueSession;
-    window.deleteSession = deleteSession;
+        label.className =
+            "chat-label";
 
-    function updateCurrentSessionBox() {
+        label.textContent =
+            message.role === "user"
+                ? "👤 You"
+                : "🤖 Vaqelix";
 
-        if (!currentSession) {
-            currentSessionBox.textContent =
-                "No study session selected yet.";
-            return;
-        }
 
-        currentSessionBox.textContent =
-            "Current study session: " +
-            currentSession.subject +
-            " — " +
-            currentSession.topic;
-    }
+        const content =
+            document.createElement("div");
 
-    /* NEW STUDY */
+        content.textContent =
+            message.content || "";
 
-    newStudyButton.addEventListener("click", () => {
-        newStudyPanel.classList.toggle("active");
 
-        if (newStudyPanel.classList.contains("active")) {
-            subjectInput.focus();
-        }
+        bubble.appendChild(label);
+        bubble.appendChild(content);
+
+        row.appendChild(bubble);
+
+        chatBox.appendChild(row);
+
     });
 
-    createStudyButton.addEventListener("click", async () => {
 
-        const subject = subjectInput.value.trim();
-        const topic = topicInput.value.trim();
-        const notice = document.getElementById("newStudyNotice");
+    chatBox.scrollTop =
+        chatBox.scrollHeight;
+}
 
-        hideNotice(notice);
 
-        if (!subject || !topic) {
-            showNotice(
-                notice,
-                "Please enter both subject and topic."
-            );
-            return;
-        }
+function updateCurrentSessionText() {
 
-        createStudyButton.disabled = true;
-        createStudyButton.textContent = "Creating...";
+    if (!currentSessionId) {
 
-        try {
+        currentSessionText.textContent =
+            "No study session selected.";
 
-            const session = await apiFetch(
+        return;
+    }
+
+    const subject =
+        currentSessionText.dataset.subject || "";
+
+    const topic =
+        currentSessionText.dataset.topic || "";
+
+
+    if (subject && topic) {
+
+        currentSessionText.textContent =
+            "Current study session: " +
+            subject +
+            " — " +
+            topic;
+
+    } else {
+
+        currentSessionText.textContent =
+            "Current study session: #" +
+            currentSessionId;
+    }
+}
+
+
+/* =========================
+   CREATE SESSION
+========================= */
+
+async function createSession() {
+
+    const subject =
+        sessionSubject.value.trim();
+
+    const topic =
+        sessionTopic.value.trim();
+
+
+    if (!subject) {
+
+        showNotice(
+            sessionNotice,
+            "Please enter a subject."
+        );
+
+        return;
+    }
+
+
+    if (!topic) {
+
+        showNotice(
+            sessionNotice,
+            "Please enter a topic."
+        );
+
+        return;
+    }
+
+
+    newSessionButton.disabled = true;
+
+
+    try {
+
+        const data =
+            await apiFetch(
                 "/sessions",
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
                     body: JSON.stringify({
                         subject: subject,
                         topic: topic
@@ -1344,824 +1407,1979 @@
                 }
             );
 
-            currentSessionId = session.id;
-            currentSession = session;
 
-            updateCurrentSessionBox();
+        currentSessionId =
+            data.id;
 
-            chatBox.innerHTML = "";
 
-            addMessage(
-                "assistant",
-                "Okay. Let's study " +
-                topic +
-                " in " +
-                subject +
-                ". What would you like to learn first?"
-            );
+        currentSessionText.dataset.subject =
+            data.subject || subject;
 
-            subjectInput.value = "";
-            topicInput.value = "";
+        currentSessionText.dataset.topic =
+            data.topic || topic;
 
-            showNotice(
-                notice,
-                "New study session created.",
-                "success"
-            );
 
-            await loadSessions();
+        chatMessages = [];
+        currentAnswer = "";
 
-            document
-                .getElementById("questionInput")
-                .focus();
+        renderChatMessages();
+        updateCurrentSessionText();
 
-        } catch (error) {
 
-            showNotice(
-                notice,
-                error.message
-            );
+        sessionSubject.value = "";
+        sessionTopic.value = "";
 
-        } finally {
 
-            createStudyButton.disabled = false;
-            createStudyButton.textContent = "Start Studying";
-        }
-    });
+        showNotice(
+            sessionNotice,
+            "Study session created successfully! 🎓",
+            "success"
+        );
 
-    /* CHAT */
 
-    function addMessage(role, content) {
+        await loadSessions();
 
-        const wrapper = document.createElement("div");
-        wrapper.className = "message " + role;
+        await loadMaterials();
 
-        const bubble = document.createElement("div");
-        bubble.className = "bubble";
 
-        bubble.textContent = content;
+    } catch (error) {
 
-        wrapper.appendChild(bubble);
-        chatBox.appendChild(wrapper);
+        showNotice(
+            sessionNotice,
+            error.message
+        );
 
-        chatBox.scrollTop = chatBox.scrollHeight;
+    } finally {
+
+        newSessionButton.disabled = false;
     }
+}
 
-    async function saveMessage(role, content) {
 
-        if (!currentSessionId) {
+newSessionButton.addEventListener(
+    "click",
+    createSession
+);
+
+
+/* =========================
+   LOAD SESSIONS
+========================= */
+
+async function loadSessions() {
+
+    try {
+
+        const data =
+            await apiFetch("/sessions");
+
+
+        const sessions =
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        sessionsList.innerHTML = "";
+
+
+        if (sessions.length === 0) {
+
+            sessionsList.innerHTML =
+                "<p>No study sessions yet.</p>";
+
             return;
         }
 
-        try {
 
+        sessions.forEach(function(session) {
+
+            const card =
+                document.createElement("div");
+
+            card.className =
+                "session-card" +
+                (
+                    currentSessionId === session.id
+                        ? " current"
+                        : ""
+                );
+
+
+            const title =
+                (session.subject || "Study") +
+                " — " +
+                (session.topic || "Untitled Topic");
+
+
+            card.innerHTML = `
+
+                <h3>
+                    ${escapeHtml(title)}
+                </h3>
+
+                <p>
+                    Subject:
+                    ${escapeHtml(session.subject || "")}
+                </p>
+
+                <p>
+                    Topic:
+                    ${escapeHtml(session.topic || "")}
+                </p>
+
+                <p>
+                    Session #${escapeHtml(session.id)}
+                </p>
+
+                <div class="session-actions">
+
+                    <button
+                        class="btn btn-blue continue-btn"
+                    >
+                        ▶️ Continue
+                    </button>
+
+                    <button
+                        class="btn btn-danger delete-btn"
+                    >
+                        🗑️ Delete
+                    </button>
+
+                </div>
+            `;
+
+
+            card.querySelector(".continue-btn")
+                .addEventListener(
+                    "click",
+                    function() {
+                        continueSession(session.id);
+                    }
+                );
+
+
+            card.querySelector(".delete-btn")
+                .addEventListener(
+                    "click",
+                    function() {
+                        deleteSession(session.id);
+                    }
+                );
+
+
+            sessionsList.appendChild(card);
+
+        });
+
+
+    } catch (error) {
+
+        showNotice(
+            sessionNotice,
+            error.message
+        );
+    }
+}
+
+
+loadSessionsButton.addEventListener(
+    "click",
+    loadSessions
+);
+
+
+/* =========================
+   CONTINUE SESSION
+========================= */
+
+async function continueSession(sessionId) {
+
+    try {
+
+        showNotice(
+            sessionNotice,
+            "Loading your study session...",
+            "success"
+        );
+
+
+        const data =
+            await apiFetch(
+                "/sessions/" + sessionId
+            );
+
+
+        currentSessionId =
+            data.id;
+
+
+        currentSessionText.dataset.subject =
+            data.subject || "";
+
+        currentSessionText.dataset.topic =
+            data.topic || "";
+
+
+        updateCurrentSessionText();
+
+
+        /*
+         * THIS IS THE IMPORTANT PART:
+         * Load messages directly from database.
+         */
+
+        chatMessages =
+            Array.isArray(data.messages)
+                ? data.messages.map(
+                    function(message) {
+
+                        return {
+                            role:
+                                message.role,
+                            content:
+                                message.content
+                        };
+
+                    }
+                )
+                : [];
+
+
+        renderChatMessages();
+
+
+        currentAnswer = "";
+
+        answerActions.style.display =
+            "none";
+
+
+        /*
+         * Load materials belonging
+         * to this exact session.
+         */
+
+        await loadMaterials();
+
+
+        await loadSessions();
+
+
+        showNotice(
+            sessionNotice,
+            "Study session loaded successfully! 🎓",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        showNotice(
+            sessionNotice,
+            error.message
+        );
+    }
+}
+
+
+/* =========================
+   DELETE SESSION
+========================= */
+
+async function deleteSession(sessionId) {
+
+    const confirmed =
+        confirm(
+            "Delete this study session and its saved data?"
+        );
+
+
+    if (!confirmed) {
+        return;
+    }
+
+
+    try {
+
+        await apiFetch(
+            "/sessions/" + sessionId,
+            {
+                method: "DELETE"
+            }
+        );
+
+
+        if (currentSessionId === sessionId) {
+
+            currentSessionId = null;
+
+            chatMessages = [];
+
+            currentAnswer = "";
+
+            currentSessionText.dataset.subject = "";
+            currentSessionText.dataset.topic = "";
+
+            updateCurrentSessionText();
+
+            renderChatMessages();
+
+            studyMaterials = [];
+
+            renderMaterials();
+
+            answerActions.style.display =
+                "none";
+        }
+
+
+        showNotice(
+            sessionNotice,
+            "Study session deleted.",
+            "success"
+        );
+
+
+        await loadSessions();
+
+
+    } catch (error) {
+
+        showNotice(
+            sessionNotice,
+            error.message
+        );
+    }
+}
+
+
+/* =========================
+   SAVE MATERIAL
+========================= */
+
+async function saveMaterial() {
+
+    if (!currentSessionId) {
+
+        showNotice(
+            materialNotice,
+            "Please create or select a study session first."
+        );
+
+        return;
+    }
+
+
+    const title =
+        materialTitle.value.trim();
+
+    const content =
+        materialContent.value.trim();
+
+
+    if (!title || !content) {
+
+        showNotice(
+            materialNotice,
+            "Please enter both title and material."
+        );
+
+        return;
+    }
+
+
+    saveMaterialButton.disabled = true;
+
+
+    try {
+
+        await apiFetch(
+            "/sessions/" +
+            currentSessionId +
+            "/materials",
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    title: title,
+                    content: content
+                })
+            }
+        );
+
+
+        materialTitle.value = "";
+        materialContent.value = "";
+
+
+        showNotice(
+            materialNotice,
+            "Study material saved successfully! 📚",
+            "success"
+        );
+
+
+        await loadMaterials();
+
+
+    } catch (error) {
+
+        showNotice(
+            materialNotice,
+            error.message
+        );
+
+    } finally {
+
+        saveMaterialButton.disabled = false;
+    }
+}
+
+
+saveMaterialButton.addEventListener(
+    "click",
+    saveMaterial
+);
+
+
+/* =========================
+   LOAD MATERIALS
+========================= */
+
+async function loadMaterials() {
+
+    if (!currentSessionId) {
+
+        studyMaterials = [];
+
+        renderMaterials();
+
+        return;
+    }
+
+
+    try {
+
+        const data =
             await apiFetch(
                 "/sessions/" +
                 currentSessionId +
-                "/messages",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        role: role,
-                        content: content
-                    })
+                "/materials"
+            );
+
+
+        studyMaterials =
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        renderMaterials();
+
+
+    } catch (error) {
+
+        showNotice(
+            materialNotice,
+            error.message
+        );
+    }
+}
+
+
+loadMaterialsButton.addEventListener(
+    "click",
+    loadMaterials
+);
+
+
+/* =========================
+   RENDER MATERIALS
+========================= */
+
+function renderMaterials() {
+
+    studyMaterialsList.innerHTML = "";
+
+
+    if (studyMaterials.length === 0) {
+
+        studyMaterialsList.innerHTML =
+            "<p>No saved study materials for this session yet.</p>";
+
+        return;
+    }
+
+
+    studyMaterials.forEach(function(material) {
+
+        const card =
+            document.createElement("div");
+
+        card.className =
+            "material-card";
+
+
+        card.innerHTML = `
+
+            <h3>
+                ${escapeHtml(
+                    material.title ||
+                    "Untitled Material"
+                )}
+            </h3>
+
+            <div class="material-preview">
+                ${escapeHtml(
+                    material.content || ""
+                )}
+            </div>
+
+            <div class="material-actions">
+
+                <button class="btn btn-blue view-btn">
+                    👁️ View
+                </button>
+
+                <button class="btn btn-light edit-btn">
+                    ✏️ Edit
+                </button>
+
+                <button class="btn btn-danger delete-material-btn">
+                    🗑️ Delete
+                </button>
+
+            </div>
+        `;
+
+
+        card.querySelector(".view-btn")
+            .addEventListener(
+                "click",
+                function() {
+                    viewMaterial(material.id);
                 }
             );
 
-        } catch {
-            /* Keep chat working even if saving fails. */
-        }
+
+        card.querySelector(".edit-btn")
+            .addEventListener(
+                "click",
+                function() {
+                    editMaterial(material.id);
+                }
+            );
+
+
+        card.querySelector(".delete-material-btn")
+            .addEventListener(
+                "click",
+                function() {
+                    deleteMaterial(material.id);
+                }
+            );
+
+
+        studyMaterialsList.appendChild(card);
+
+    });
+}
+
+
+/* =========================
+   PDF UPLOAD
+========================= */
+
+async function uploadPdf() {
+
+    if (!currentSessionId) {
+
+        showNotice(
+            pdfNotice,
+            "Please create or select a study session first."
+        );
+
+        return;
     }
 
-    async function sendQuestion() {
 
-        const question = questionInput.value.trim();
-        const notice = document.getElementById("chatNotice");
+    const file =
+        pdfFile.files[0];
 
-        hideNotice(notice);
 
-        if (!question) {
-            showNotice(
-                notice,
-                "Please enter a study question."
+    if (!file) {
+
+        showNotice(
+            pdfNotice,
+            "Please choose a PDF file."
+        );
+
+        return;
+    }
+
+
+    if (
+        !file.name
+            .toLowerCase()
+            .endsWith(".pdf")
+    ) {
+
+        showNotice(
+            pdfNotice,
+            "Please select a PDF file."
+        );
+
+        return;
+    }
+
+
+    uploadPdfButton.disabled = true;
+
+
+    showNotice(
+        pdfNotice,
+        "Uploading PDF...",
+        "success"
+    );
+
+
+    try {
+
+        const formData =
+            new FormData();
+
+        formData.append(
+            "file",
+            file
+        );
+
+
+        const data =
+            await apiFetch(
+                "/sessions/" +
+                currentSessionId +
+                "/materials/upload-pdf",
+                {
+                    method: "POST",
+                    body: formData
+                }
             );
-            return;
+
+
+        pdfFile.value = "";
+
+
+        showNotice(
+            pdfNotice,
+            "PDF uploaded and saved successfully! 📄",
+            "success"
+        );
+
+
+        await loadMaterials();
+
+
+    } catch (error) {
+
+        showNotice(
+            pdfNotice,
+            error.message
+        );
+
+    } finally {
+
+        uploadPdfButton.disabled = false;
+    }
+}
+
+
+uploadPdfButton.addEventListener(
+    "click",
+    uploadPdf
+);
+
+
+/* =========================
+   IMAGE UPLOAD
+========================= */
+
+async function uploadImage() {
+
+    if (!currentSessionId) {
+
+        showNotice(
+            imageNotice,
+            "Please create or select a study session first."
+        );
+
+        return;
+    }
+
+
+    const file =
+        imageFile.files[0];
+
+
+    if (!file) {
+
+        showNotice(
+            imageNotice,
+            "Please choose an image."
+        );
+
+        return;
+    }
+
+
+    const allowedTypes = [
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ];
+
+
+    if (
+        !allowedTypes.includes(file.type)
+    ) {
+
+        showNotice(
+            imageNotice,
+            "Please select a JPG, PNG, or WEBP image."
+        );
+
+        return;
+    }
+
+
+    uploadImageButton.disabled = true;
+
+
+    showNotice(
+        imageNotice,
+        "Vaqelix is understanding the image...",
+        "success"
+    );
+
+
+    try {
+
+        const formData =
+            new FormData();
+
+        formData.append(
+            "file",
+            file
+        );
+
+
+        const question =
+            imageQuestion.value.trim();
+
+
+        let endpoint =
+            "/sessions/" +
+            currentSessionId +
+            "/materials/upload-image";
+
+
+        if (question) {
+
+            endpoint +=
+                "?question=" +
+                encodeURIComponent(question);
         }
 
-        if (!currentSessionId) {
 
-            showNotice(
-                notice,
-                "Please start or continue a study session first."
+        const data =
+            await apiFetch(
+                endpoint,
+                {
+                    method: "POST",
+                    body: formData
+                }
             );
 
-            return;
+
+        imageFile.value = "";
+        imageQuestion.value = "";
+
+
+        imageResult.innerHTML = `
+
+            <div class="material-card">
+
+                <h3>
+                    🤖 Vaqelix's Understanding
+                </h3>
+
+                <div class="material-preview">
+                    ${escapeHtml(
+                        data.content ||
+                        "No explanation was returned."
+                    )}
+                </div>
+
+            </div>
+        `;
+
+
+        showNotice(
+            imageNotice,
+            "Image understood and saved successfully! 🖼️",
+            "success"
+        );
+
+
+        await loadMaterials();
+
+
+    } catch (error) {
+
+        showNotice(
+            imageNotice,
+            error.message
+        );
+
+    } finally {
+
+        uploadImageButton.disabled = false;
+    }
+}
+
+
+uploadImageButton.addEventListener(
+    "click",
+    uploadImage
+);
+
+
+/* =========================
+   VIEW MATERIAL
+========================= */
+
+async function viewMaterial(materialId) {
+
+    try {
+
+        const data =
+            await apiFetch(
+                "/materials/" + materialId
+            );
+
+
+        viewMaterialContent.innerHTML = `
+
+            <h3>
+                ${escapeHtml(
+                    data.title ||
+                    "Study Material"
+                )}
+            </h3>
+
+            <div class="material-preview">
+                ${escapeHtml(
+                    data.content || ""
+                )}
+            </div>
+        `;
+
+
+        viewMaterialModal.style.display =
+            "block";
+
+
+    } catch (error) {
+
+        alert(error.message);
+    }
+}
+
+
+closeViewMaterial.addEventListener(
+    "click",
+    function() {
+
+        viewMaterialModal.style.display =
+            "none";
+
+    }
+);
+
+
+/* =========================
+   EDIT MATERIAL
+========================= */
+
+async function editMaterial(materialId) {
+
+    try {
+
+        const data =
+            await apiFetch(
+                "/materials/" + materialId
+            );
+
+
+        editingMaterialId =
+            materialId;
+
+
+        editMaterialTitle.value =
+            data.title || "";
+
+        editMaterialContent.value =
+            data.content || "";
+
+
+        editMaterialModal.style.display =
+            "block";
+
+
+    } catch (error) {
+
+        alert(error.message);
+    }
+}
+
+
+async function updateMaterial() {
+
+    if (!editingMaterialId) {
+        return;
+    }
+
+
+    const title =
+        editMaterialTitle.value.trim();
+
+    const content =
+        editMaterialContent.value.trim();
+
+
+    if (!title || !content) {
+
+        showNotice(
+            editMaterialNotice,
+            "Please enter both title and content."
+        );
+
+        return;
+    }
+
+
+    updateMaterialButton.disabled = true;
+
+
+    try {
+
+        await apiFetch(
+            "/materials/" +
+            editingMaterialId,
+            {
+                method: "PUT",
+                body: JSON.stringify({
+                    title: title,
+                    content: content
+                })
+            }
+        );
+
+
+        showNotice(
+            editMaterialNotice,
+            "Material updated successfully! 📚",
+            "success"
+        );
+
+
+        await loadMaterials();
+
+
+        setTimeout(
+            function() {
+
+                editMaterialModal.style.display =
+                    "none";
+
+            },
+            500
+        );
+
+
+    } catch (error) {
+
+        showNotice(
+            editMaterialNotice,
+            error.message
+        );
+
+    } finally {
+
+        updateMaterialButton.disabled = false;
+    }
+}
+
+
+updateMaterialButton.addEventListener(
+    "click",
+    updateMaterial
+);
+
+
+closeEditMaterial.addEventListener(
+    "click",
+    function() {
+
+        editMaterialModal.style.display =
+            "none";
+
+    }
+);
+
+
+/* =========================
+   DELETE MATERIAL
+========================= */
+
+async function deleteMaterial(materialId) {
+
+    if (
+        !confirm(
+            "Delete this study material?"
+        )
+    ) {
+        return;
+    }
+
+
+    try {
+
+        await apiFetch(
+            "/materials/" + materialId,
+            {
+                method: "DELETE"
+            }
+        );
+
+
+        showNotice(
+            materialNotice,
+            "Study material deleted.",
+            "success"
+        );
+
+
+        await loadMaterials();
+
+
+    } catch (error) {
+
+        showNotice(
+            materialNotice,
+            error.message
+        );
+    }
+}
+
+
+/* =========================
+   ASK VAQELIX
+========================= */
+
+async function askQuestion() {
+
+    const question =
+        questionInput.value.trim();
+
+
+    if (!question) {
+
+        showNotice(
+            askNotice,
+            "Please enter a study question."
+        );
+
+        return;
+    }
+
+
+    askButton.disabled = true;
+
+
+    /*
+     * Display the question immediately.
+     */
+
+    chatMessages.push({
+        role: "user",
+        content: question
+    });
+
+
+    renderChatMessages();
+
+    questionInput.value = "";
+
+
+    showNotice(
+        askNotice,
+        "Vaqelix is thinking...",
+        "success"
+    );
+
+
+    try {
+
+        const body = {
+            question: question
+        };
+
+
+        if (currentSessionId) {
+
+            body.session_id =
+                currentSessionId;
         }
 
-        addMessage("user", question);
-        questionInput.value = "";
 
-        await saveMessage("user", question);
-
-        sendButton.disabled = true;
-        sendButton.textContent = "Thinking...";
-
-        try {
-
-            const data = await apiFetch(
+        const data =
+            await apiFetch(
                 "/ask",
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        question: question,
-                        session_id: currentSessionId
-                    })
+                    body: JSON.stringify(body)
                 }
             );
 
-            const answer =
-                data.answer ||
-                "I could not generate an answer.";
 
-            lastAssistantAnswer = answer;
+        currentAnswer =
+            data.answer || "";
 
-            addMessage(
-                "assistant",
-                answer
-            );
 
-            await saveMessage(
-                "assistant",
-                answer
-            );
+        chatMessages.push({
+            role: "assistant",
+            content: currentAnswer
+        });
 
-            await loadSessions();
 
-        } catch (error) {
+        renderChatMessages();
 
-            addMessage(
-                "assistant",
-                "Sorry, I could not answer that right now."
-            );
 
-            showNotice(
-                notice,
-                error.message
-            );
+        answerActions.style.display =
+            "flex";
 
-        } finally {
 
-            sendButton.disabled = false;
-            sendButton.textContent = "Send";
+        showNotice(
+            askNotice,
+            "Answer generated successfully! 🎓",
+            "success"
+        );
 
-            questionInput.focus();
+
+    } catch (error) {
+
+        /*
+         * Remove the question from
+         * the visible chat if request failed.
+         */
+
+        chatMessages.pop();
+
+        renderChatMessages();
+
+
+        showNotice(
+            askNotice,
+            error.message
+        );
+
+    } finally {
+
+        askButton.disabled = false;
+    }
+}
+
+
+askButton.addEventListener(
+    "click",
+    askQuestion
+);
+
+
+/* =========================
+   ENTER KEY
+========================= */
+
+questionInput.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key === "Enter" &&
+            !event.shiftKey
+        ) {
+
+            event.preventDefault();
+
+            askQuestion();
         }
     }
+);
 
-    sendButton.addEventListener(
-        "click",
-        sendQuestion
+
+/* =========================
+   SIMPLIFY
+========================= */
+
+async function simplifyAnswer() {
+
+    if (!currentAnswer) {
+
+        showNotice(
+            askNotice,
+            "Please ask a question first."
+        );
+
+        return;
+    }
+
+
+    simplifyButton.disabled = true;
+
+
+    showNotice(
+        askNotice,
+        "Vaqelix is explaining it more simply...",
+        "success"
     );
 
-    questionInput.addEventListener(
-        "keydown",
-        event => {
 
-            if (
-                event.key === "Enter" &&
-                !event.shiftKey
-            ) {
+    try {
 
-                event.preventDefault();
-                sendQuestion();
-            }
-        }
-    );
-
-    /* SIMPLIFY */
-
-    simplifyButton.addEventListener("click", async () => {
-
-        const notice =
-            document.getElementById("chatNotice");
-
-        hideNotice(notice);
-
-        if (!lastAssistantAnswer) {
-
-            showNotice(
-                notice,
-                "Ask Vaqelix something first."
-            );
-
-            return;
-        }
-
-        simplifyButton.disabled = true;
-        simplifyButton.textContent = "Simplifying...";
-
-        try {
-
-            const data = await apiFetch(
+        const data =
+            await apiFetch(
                 "/simplify",
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
                     body: JSON.stringify({
-                        answer: lastAssistantAnswer
+                        answer: currentAnswer
                     })
                 }
             );
 
-            const answer =
-                data.answer ||
-                "I could not simplify that answer.";
 
-            lastAssistantAnswer = answer;
+        currentAnswer =
+            data.answer || "";
 
-            addMessage(
-                "assistant",
-                answer
-            );
 
-            await saveMessage(
-                "assistant",
-                answer
-            );
+        if (
+            chatMessages.length > 0 &&
+            chatMessages[
+                chatMessages.length - 1
+            ].role === "assistant"
+        ) {
 
-        } catch (error) {
-
-            showNotice(
-                notice,
-                error.message
-            );
-
-        } finally {
-
-            simplifyButton.disabled = false;
-            simplifyButton.textContent =
-                "✨ Explain Simpler";
-        }
-    });
-
-    /* UNDERSTAND */
-
-    understandButton.addEventListener("click", () => {
-
-        if (!currentSessionId) {
-            return;
+            chatMessages[
+                chatMessages.length - 1
+            ].content =
+                currentAnswer;
         }
 
-        addMessage(
-            "assistant",
-            "Great. When you're ready, you can practice the topic or take a quiz."
+
+        renderChatMessages();
+
+
+        showNotice(
+            askNotice,
+            "Explanation simplified! 💡",
+            "success"
         );
 
-        saveMessage(
-            "assistant",
-            "Student marked the topic as understood."
+
+    } catch (error) {
+
+        showNotice(
+            askNotice,
+            error.message
         );
-    });
 
-    /* PRACTICE */
+    } finally {
 
-    practiceButton.addEventListener("click", async () => {
+        simplifyButton.disabled = false;
+    }
+}
 
-        const notice =
-            document.getElementById("practiceNotice");
 
-        hideNotice(notice);
+simplifyButton.addEventListener(
+    "click",
+    simplifyAnswer
+);
 
-        practiceList.innerHTML = "";
 
-        if (!currentSession) {
+/* =========================
+   UNDERSTAND
+========================= */
 
-            showNotice(
-                notice,
-                "Please start or continue a study session first."
-            );
+understandButton.addEventListener(
+    "click",
+    function() {
 
-            return;
-        }
+        showNotice(
+            askNotice,
+            "Great! Now you can practice this topic. 🎓",
+            "success"
+        );
 
-        practiceButton.disabled = true;
-        practiceButton.textContent = "Creating...";
+        practiceTopic.focus();
+    }
+);
 
-        try {
 
-            const data = await apiFetch(
+/* =========================
+   PRACTICE
+========================= */
+
+async function generatePractice() {
+
+    const topic =
+        practiceTopic.value.trim();
+
+
+    if (!topic) {
+
+        showNotice(
+            practiceNotice,
+            "Please enter a topic."
+        );
+
+        return;
+    }
+
+
+    practiceButton.disabled = true;
+
+
+    showNotice(
+        practiceNotice,
+        "Generating practice questions...",
+        "success"
+    );
+
+
+    try {
+
+        const data =
+            await apiFetch(
                 "/practice",
                 {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
                     body: JSON.stringify({
-                        topic:
-                            currentSession.topic
+                        topic: topic
                     })
                 }
             );
 
-            if (
-                data.error ||
-                !data.questions ||
-                data.questions.length === 0
-            ) {
 
-                throw new Error(
-                    data.error ||
-                    "No practice questions were created."
-                );
-            }
+        practiceResult.innerHTML = "";
 
-            practiceList.innerHTML =
-                data.questions.map(
-                    (item, index) => `
-                        <div class="practice-item">
-                            <h4>
-                                ${index + 1}.
-                                ${escapeHtml(item.question)}
-                            </h4>
 
-                            <div class="practice-answer">
-                                Answer:
-                                ${escapeHtml(item.answer)}
-                            </div>
-                        </div>
-                    `
-                ).join("");
+        const questions =
+            Array.isArray(data.questions)
+                ? data.questions
+                : [];
 
-        } catch (error) {
 
-            showNotice(
-                notice,
-                error.message
-            );
+        if (questions.length === 0) {
 
-        } finally {
-
-            practiceButton.disabled = false;
-            practiceButton.textContent =
-                "Create Practice Questions";
-        }
-    });
-
-    /* QUIZ SETUP */
-
-    openQuizButton.addEventListener("click", () => {
-
-        quizSection.scrollIntoView({
-            behavior: "smooth"
-        });
-
-    });
-
-    document.querySelectorAll(".count-btn")
-        .forEach(button => {
-
-            button.addEventListener("click", () => {
-
-                document
-                    .querySelectorAll(".count-btn")
-                    .forEach(btn =>
-                        btn.classList.remove("active")
-                    );
-
-                button.classList.add("active");
-
-                const value =
-                    button.dataset.count;
-
-                if (value === "custom") {
-
-                    selectedQuizCount = "custom";
-
-                    customCountBox.classList.add(
-                        "active"
-                    );
-
-                    customCountInput.focus();
-
-                } else {
-
-                    selectedQuizCount =
-                        Number(value);
-
-                    customCountBox.classList.remove(
-                        "active"
-                    );
-                }
-            });
-        });
-
-    /* START QUIZ */
-
-    startQuizButton.addEventListener(
-        "click",
-        async () => {
-
-            const notice =
-                document.getElementById("quizNotice");
-
-            hideNotice(notice);
-
-            if (!currentSession) {
-
-                showNotice(
-                    notice,
-                    "Please start or continue a study session first."
-                );
-
-                return;
-            }
-
-            let count =
-                selectedQuizCount;
-
-            if (count === "custom") {
-
-                count =
-                    Number(
-                        customCountInput.value
-                    );
-
-                if (
-                    !Number.isInteger(count) ||
-                    count < 1 ||
-                    count > 50
-                ) {
-
-                    showNotice(
-                        notice,
-                        "Custom question count must be between 1 and 50."
-                    );
-
-                    return;
-                }
-            }
-
-            const source =
-                quizSource.value;
-
-            let quizTopic =
-                currentSession.topic;
-
-            if (source === "material") {
-
-                const material =
-                    prompt(
-                        "Paste your study material here:"
-                    );
-
-                if (!material || !material.trim()) {
-                    return;
-                }
-
-                quizTopic =
-                    material.trim();
-            }
-
-            startQuizButton.disabled = true;
-            startQuizButton.textContent =
-                "Creating Quiz...";
-
-            try {
-
-                const data = await apiFetch(
-                    "/quiz",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            topic: quizTopic,
-                            question_count: count,
-                            source: source
-                        })
-                    }
-                );
-
-                if (
-                    data.error ||
-                    !data.quiz ||
-                    data.quiz.length === 0
-                ) {
-
-                    throw new Error(
-                        data.error ||
-                        "Could not create quiz."
-                    );
-                }
-
-                quizData = data.quiz;
-                quizAnswers =
-                    new Array(
-                        quizData.length
-                    ).fill(null);
-
-                currentQuizIndex = 0;
-
-                scoreBox.classList.remove(
-                    "active"
-                );
-
-                quizArea.classList.add(
-                    "active"
-                );
-
-                renderQuizQuestion();
-
-                quizArea.scrollIntoView({
-                    behavior: "smooth"
-                });
-
-            } catch (error) {
-
-                showNotice(
-                    notice,
-                    error.message
-                );
-
-            } finally {
-
-                startQuizButton.disabled = false;
-                startQuizButton.textContent =
-                    "Start Quiz";
-            }
-        }
-    );
-
-    /* QUIZ DISPLAY */
-
-    function renderQuizQuestion() {
-
-        const question =
-            quizData[currentQuizIndex];
-
-        if (!question) {
-            return;
-        }
-
-        const total =
-            quizData.length;
-
-        const number =
-            currentQuizIndex + 1;
-
-        quizProgress.textContent =
-            "Question " +
-            number +
-            " of " +
-            total;
-
-        progressFill.style.width =
-            ((number / total) * 100) +
-            "%";
-
-        quizQuestion.textContent =
-            question.question;
-
-        quizOptions.innerHTML = "";
-
-        ["A", "B", "C", "D"]
-            .forEach(letter => {
-
-                const button =
-                    document.createElement("button");
-
-                button.className =
-                    "option";
-
-                button.textContent =
-                    letter +
-                    ". " +
-                    question.options[letter];
-
-                if (
-                    quizAnswers[
-                        currentQuizIndex
-                    ] === letter
-                ) {
-
-                    button.classList.add(
-                        "selected"
-                    );
-                }
-
-                button.addEventListener(
-                    "click",
-                    () => {
-
-                        quizAnswers[
-                            currentQuizIndex
-                        ] = letter;
-
-                        document
-                            .querySelectorAll(".option")
-                            .forEach(
-                                option =>
-                                    option.classList.remove(
-                                        "selected"
-                                    )
-                            );
-
-                        button.classList.add(
-                            "selected"
-                        );
-                    }
-                );
-
-                quizOptions.appendChild(
-                    button
-                );
-            });
-
-        previousQuestionButton.disabled =
-            currentQuizIndex === 0;
-
-        nextQuestionButton.textContent =
-            currentQuizIndex === total - 1
-                ? "Finish Quiz"
-                : "Next";
-    }
-
-    previousQuestionButton.addEventListener(
-        "click",
-        () => {
-
-            if (currentQuizIndex > 0) {
-
-                currentQuizIndex--;
-                renderQuizQuestion();
-            }
-        }
-    );
-
-    nextQuestionButton.addEventListener(
-        "click",
-        () => {
-
-            if (
-                quizAnswers[
-                    currentQuizIndex
-                ] === null
-            ) {
-
-                alert(
-                    "Please select an answer first."
-                );
-
-                return;
-            }
-
-            if (
-                currentQuizIndex <
-                quizData.length - 1
-            ) {
-
-                currentQuizIndex++;
-                renderQuizQuestion();
-
-            } else {
-
-                finishQuiz();
-            }
-        }
-    );
-
-    /* SCORE */
-
-    function finishQuiz() {
-
-        let score = 0;
-
-        quizData.forEach(
-            (question, index) => {
-
-                if (
-                    quizAnswers[index] ===
-                    question.correct
-                ) {
-
-                    score++;
-                }
-            }
-        );
-
-        scoreNumber.textContent =
-            score +
-            "/" +
-            quizData.length;
-
-        const percentage =
-            Math.round(
-                (score / quizData.length) *
-                100
-            );
-
-        if (percentage >= 80) {
-
-            scoreMessage.textContent =
-                "Excellent understanding. Keep going!";
-
-        } else if (percentage >= 60) {
-
-            scoreMessage.textContent =
-                "Good work. Review the missed questions.";
+            practiceResult.textContent =
+                "No practice questions were returned.";
 
         } else {
 
-            scoreMessage.textContent =
-                "Keep practicing. You can improve your understanding.";
+            questions.forEach(
+                function(question, index) {
+
+                    const item =
+                        document.createElement("div");
+
+                    item.className =
+                        "practice-question";
+
+                    item.textContent =
+                        (index + 1) +
+                        ". " +
+                        question;
+
+                    practiceResult.appendChild(item);
+
+                }
+            );
         }
 
-        reviewList.innerHTML =
-            quizData.map(
-                (question, index) => {
 
-                    const userAnswer =
-                        quizAnswers[index];
+        practiceResult.style.display =
+            "block";
 
-                    const correct =
-                        userAnswer ===
-                        question.correct;
 
-                    return `
-                        <div class="review-item ${correct ? "correct" : "wrong"}">
-
-                            <strong>
-                                ${index + 1}.
-                                ${escapeHtml(question.question)}
-                            </strong>
-
-                            <div class="review-answer">
-                                Your answer:
-                                ${escapeHtml(
-                                    userAnswer
-                                        ? question.options[userAnswer]
-                                        : "Not answered"
-                                )}
-                            </div>
-
-                            <div class="review-answer">
-                                Correct answer:
-                                ${escapeHtml(
-                                    question.options[
-                                        question.correct
-                                    ]
-                                )}
-                            </div>
-
-                        </div>
-                    `;
-                }
-            ).join("");
-
-        quizArea.classList.remove(
-            "active"
+        showNotice(
+            practiceNotice,
+            "Practice questions generated! ✍️",
+            "success"
         );
 
-        scoreBox.classList.add(
-            "active"
+
+    } catch (error) {
+
+        showNotice(
+            practiceNotice,
+            error.message
         );
 
-        scoreBox.scrollIntoView({
-            behavior: "smooth"
-        });
+    } finally {
+
+        practiceButton.disabled = false;
+    }
+}
+
+
+practiceButton.addEventListener(
+    "click",
+    generatePractice
+);
+
+
+/* =========================
+   QUIZ
+========================= */
+
+async function generateQuiz() {
+
+    const topic =
+        quizTopic.value.trim();
+
+    const count =
+        Number(quizCount.value);
+
+    if (!topic) {
+
+        showNotice(
+            quizNotice,
+            "Please enter a quiz topic."
+        );
+
+        return;
     }
 
-    newQuizButton.addEventListener(
-        "click",
-        () => {
+    quizButton.disabled = true;
 
-            scoreBox.classList.remove(
-                "active"
+    showNotice(
+        quizNotice,
+        "Creating your quiz...",
+        "success"
+    );
+
+    try {
+
+        const data =
+            await apiFetch(
+                "/quiz",
+                {
+                    method: "POST",
+                    body: JSON.stringify({
+                        topic: topic,
+                        question_count: count,
+                        source: "topic"
+                    })
+                }
             );
 
-            quizArea.classList.remove(
-                "active"
+        quizQuestions =
+            Array.isArray(data.quiz)
+                ? data.quiz
+                : [];
+
+        quizAnswers = {};
+
+        currentQuizIndex = 0;
+
+        renderQuiz();
+
+        showNotice(
+            quizNotice,
+            "Quiz created! 🧠",
+            "success"
+        );
+
+    } catch (error) {
+
+        showNotice(
+            quizNotice,
+            error.message
+        );
+
+    } finally {
+
+        quizButton.disabled = false;
+    }
+}
+
+
+quizButton.addEventListener(
+    "click",
+    generateQuiz
+);
+
+
+/* =========================
+   RENDER CURRENT QUESTION
+========================= */
+
+function renderQuiz() {
+
+    quizContainer.innerHTML = "";
+
+    quizResult.style.display =
+        "none";
+
+    if (quizQuestions.length === 0) {
+
+        quizContainer.innerHTML =
+            "<p>No quiz questions were returned.</p>";
+
+        finishQuizButton.style.display =
+            "none";
+
+        return;
+    }
+
+    const question =
+        quizQuestions[currentQuizIndex];
+
+    const card =
+        document.createElement("div");
+
+    card.className =
+        "quiz-question";
+
+
+    const options =
+        question.options || {};
+
+
+    let optionsHtml = "";
+
+
+    ["A", "B", "C", "D"]
+        .forEach(
+            function(letter) {
+
+                const selected =
+                    quizAnswers[currentQuizIndex] === letter
+                        ? "checked"
+                        : "";
+
+                optionsHtml += `
+
+                    <label class="quiz-option">
+
+                        <input
+                            type="radio"
+                            name="quiz-current"
+                            value="${letter}"
+                            ${selected}
+                        >
+
+                        <strong>
+                            ${letter}.
+                        </strong>
+
+                        ${escapeHtml(
+                            options[letter] || ""
+                        )}
+
+                    </label>
+                `;
+            }
+        );
+
+
+    card.innerHTML = `
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom:12px;
+        ">
+
+            <h3 style="margin:0;">
+                Question ${currentQuizIndex + 1}
+                of
+                ${quizQuestions.length}
+            </h3>
+
+        </div>
+
+        <p>
+            ${escapeHtml(
+                question.question || ""
+            )}
+        </p>
+
+        ${optionsHtml}
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            gap:10px;
+            margin-top:20px;
+        ">
+
+            <button
+                type="button"
+                id="previousQuizButton"
+                ${currentQuizIndex === 0 ? "disabled" : ""}
+            >
+                ← Previous
+            </button>
+
+            ${
+                currentQuizIndex <
+                quizQuestions.length - 1
+                    ? `
+                        <button
+                            type="button"
+                            id="nextQuizButton"
+                        >
+                            Next →
+                        </button>
+                    `
+                    : `
+                        <button
+                            type="button"
+                            id="lastFinishQuizButton"
+                        >
+                            ✅ Finish Quiz
+                        </button>
+                    `
+            }
+
+        </div>
+    `;
+
+
+    const radios =
+        card.querySelectorAll(
+            'input[type="radio"]'
+        );
+
+
+    radios.forEach(
+        function(radio) {
+
+            radio.addEventListener(
+                "change",
+                function() {
+
+                    quizAnswers[currentQuizIndex] =
+                        this.value;
+
+                }
             );
 
-            quizSection.scrollIntoView({
-                behavior: "smooth"
-            });
         }
     );
 
-    /* INITIALIZE */
 
-    checkConnection();
-    loadSessions();
+    const previousButton =
+        card.querySelector(
+            "#previousQuizButton"
+        );
+
+
+    if (previousButton) {
+
+        previousButton.addEventListener(
+            "click",
+            function() {
+
+                if (currentQuizIndex > 0) {
+
+                    currentQuizIndex--;
+
+                    renderQuiz();
+                }
+
+            }
+        );
+    }
+
+
+    const nextButton =
+        card.querySelector(
+            "#nextQuizButton"
+        );
+
+
+    if (nextButton) {
+
+        nextButton.addEventListener(
+            "click",
+            function() {
+
+                if (
+                    currentQuizIndex <
+                    quizQuestions.length - 1
+                ) {
+
+                    currentQuizIndex++;
+
+                    renderQuiz();
+                }
+
+            }
+        );
+    }
+
+
+    const lastFinishButton =
+        card.querySelector(
+            "#lastFinishQuizButton"
+        );
+
+
+    if (lastFinishButton) {
+
+        lastFinishButton.addEventListener(
+            "click",
+            finishQuiz
+        );
+    }
+
+
+    quizContainer.appendChild(card);
+
+
+    finishQuizButton.style.display =
+        "none";
+}
+
+
+/* =========================
+   FINISH QUIZ
+========================= */
+
+function finishQuiz() {
+
+    if (quizQuestions.length === 0) {
+        return;
+    }
+
+
+    let score = 0;
+
+
+    quizQuestions.forEach(
+        function(question, index) {
+
+            if (
+                quizAnswers[index] ===
+                question.answer
+            ) {
+
+                score++;
+            }
+
+        }
+    );
+
+
+    let reviewHtml = `
+
+        <div style="
+            margin-top:20px;
+        ">
+
+            <h3>
+                Question Review
+            </h3>
+
+    `;
+
+
+    quizQuestions.forEach(
+        function(question, index) {
+
+            const userAnswer =
+                quizAnswers[index] || null;
+
+            const correctAnswer =
+                question.answer;
+
+            const isCorrect =
+                userAnswer === correctAnswer;
+
+
+            const statusText =
+                isCorrect
+                    ? "✅ Correct"
+                    : "❌ Wrong";
+
+
+            const userAnswerText =
+                userAnswer
+                    ? `${userAnswer}. ${
+                        question.options[userAnswer] || ""
+                    }`
+                    : "Not answered";
+
+
+            const correctAnswerText =
+                `${correctAnswer}. ${
+                    question.options[correctAnswer] || ""
+                }`;
+
+
+            reviewHtml += `
+
+                <div style="
+                    margin-top:16px;
+                    padding:16px;
+                    border-radius:10px;
+                    border:1px solid #dbe8f2;
+                    background:#ffffff;
+                ">
+
+                    <strong>
+                        Question ${index + 1}
+                    </strong>
+
+                    <div style="
+                        margin-top:8px;
+                        font-weight:600;
+                    ">
+                        ${statusText}
+                    </div>
+
+                    <p>
+                        ${escapeHtml(
+                            question.question || ""
+                        )}
+                    </p>
+
+                    <p>
+                        <strong>
+                            Your answer:
+                        </strong>
+                        ${escapeHtml(userAnswerText)}
+                    </p>
+
+                    <p>
+                        <strong>
+                            Correct answer:
+                        </strong>
+                        ${escapeHtml(correctAnswerText)}
+                    </p>
+
+                    <p>
+                        <strong>
+                            Explanation:
+                        </strong>
+                        ${escapeHtml(
+                            question.explanation ||
+                            "Explanation not available."
+                        )}
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    reviewHtml += `
+        </div>
+    `;
+
+
+    quizResult.innerHTML = `
+
+        <div>
+
+            <strong>
+                Quiz Complete! 🎓
+            </strong>
+
+            <br><br>
+
+            Your score:
+            <strong>
+                ${score} / ${quizQuestions.length}
+            </strong>
+
+            ${reviewHtml}
+
+        </div>
+    `;
+
+
+    quizResult.style.display =
+        "block";
+
+
+    quizResult.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+
+finishQuizButton.addEventListener(
+    "click",
+    finishQuiz
+);
+
+/* =========================
+   MODALS
+========================= */
+
+window.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target ===
+            viewMaterialModal
+        ) {
+
+            viewMaterialModal.style.display =
+                "none";
+        }
+
+
+        if (
+            event.target ===
+            editMaterialModal
+        ) {
+
+            editMaterialModal.style.display =
+                "none";
+        }
+    }
+);
+
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+renderChatMessages();
+
+updateCurrentSessionText();
+
+loadSessions();
 
 </script>
 
