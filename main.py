@@ -61,10 +61,7 @@ class StudyMaterialRequest(BaseModel):
 # HOME
 # =========================
 
-@app.get("/")
-def home():
-    return {"message": "Vaqelix is running!"}
-
+app.frontend("/", directory="frontend")
 
 # =========================
 # ASK VAQELIX
