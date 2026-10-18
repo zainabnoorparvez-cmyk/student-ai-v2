@@ -5,3 +5,8 @@ sqlalchemy
 python-dotenv
 huggingface_hub
 pypdf
+groq
+
+python-multipart
+pdf2image
+pytesseract

@@ -1,19 +1,21 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from ai_provider import ask_ai, simplify_answer, analyze_image
-from database import SessionLocal, StudySession, Message, StudyMaterial
+from database import SessionLocal, StudySession, Message, StudyMaterial, PDFProcessingJob
 import json
 import re
 from datetime import datetime
 from pypdf import PdfReader
 from io import BytesIO
+from pdf2image import convert_from_bytes
+import pytesseract
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:5500"],
+    allow_origins=["http://127.0.0.1:5500", "http://localhost:5500"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -40,6 +42,7 @@ class QuizRequest(BaseModel):
     topic: str
     question_count: int = 5
     source: str = "topic"
+    session_id: int | None = None
 
 
 class CreateSessionRequest(BaseModel):
@@ -72,23 +75,24 @@ def ask_question(data: Question):
     db = SessionLocal()
 
     try:
-        # No session selected
+        # No session selected: answer without saved session context.
         if data.session_id is None:
-            answer = ask_ai(data.question)
-            return {"answer": answer}
+            return {"answer": ask_ai(data.question)}
 
-        # Find current study session
-        session = db.query(StudySession).filter(
-            StudySession.id == data.session_id
-        ).first()
+        # Find the selected study session.
+        session = (
+            db.query(StudySession)
+            .filter(StudySession.id == data.session_id)
+            .first()
+        )
 
-        if not session:
+        if session is None:
             raise HTTPException(
                 status_code=404,
                 detail="Study session not found"
             )
 
-        # Get recent messages
+        # Retrieve recent conversation messages.
         messages = (
             db.query(Message)
             .filter(Message.session_id == data.session_id)
@@ -96,22 +100,59 @@ def ask_question(data: Question):
             .limit(10)
             .all()
         )
-
         messages = list(reversed(messages))
 
-        context = f"""
-The student is currently studying:
+        # Retrieve saved materials belonging to this session only.
+        materials = (
+            db.query(StudyMaterial)
+            .filter(StudyMaterial.session_id == data.session_id)
+            .order_by(StudyMaterial.created_at.asc())
+            .all()
+        )
 
-Subject: {session.subject}
-Topic: {session.topic}
+        material_sections = []
+        remaining_chars = 16000
 
-Use this study context when answering the student's question.
-Do not unnecessarily restart the whole topic.
-"""
+        for material in materials:
+            content = (material.content or "").strip()
+
+            if not content or remaining_chars <= 0:
+                continue
+
+            # Ignore placeholder image-upload tests.
+            if content.startswith("[MOCK MODE — IMAGE UPLOAD TEST]"):
+                continue
+
+            section = (
+                f"Material title: {material.title}\n"
+                f"Material content:\n{content}"
+            )
+            section = section[:remaining_chars]
+            material_sections.append(section)
+            remaining_chars -= len(section)
+
+        context = (
+            "You are Vaqelix, a study assistant. "
+            "Answer educational questions in simple, clear words. "
+            "Use the saved study materials below when they are relevant. "
+            "If the student asks about a specific document, check its title "
+            "and content before answering. Do not claim you cannot access "
+            "saved files when their text is provided below. "
+            "Do not invent facts absent from the materials; be clear when "
+            "the requested information is not available.\n\n"
+            f"Subject: {session.subject}\n"
+            f"Topic: {session.topic}\n"
+        )
+
+        if material_sections:
+            context += (
+                "\nSaved study materials for this session:\n"
+                + "\n\n---\n\n".join(material_sections)
+                + "\n"
+            )
 
         if messages:
             context += "\nRecent conversation:\n"
-
             for message in messages:
                 context += f"{message.role}: {message.content}\n"
 
@@ -119,26 +160,19 @@ Do not unnecessarily restart the whole topic.
 
         answer = ask_ai(context)
 
-        # Save student message
-        student_message = Message(
+        # Save the new conversation messages.
+        db.add(Message(
             session_id=data.session_id,
             role="user",
             content=data.question
-        )
-
-        # Save AI response
-        assistant_message = Message(
+        ))
+        db.add(Message(
             session_id=data.session_id,
             role="assistant",
             content=answer
-        )
+        ))
 
-        db.add(student_message)
-        db.add(assistant_message)
-
-        # Update session activity
         session.updated_at = datetime.utcnow()
-
         db.commit()
 
         return {"answer": answer}
@@ -146,10 +180,6 @@ Do not unnecessarily restart the whole topic.
     finally:
         db.close()
 
-
-# =========================
-# EXPLAIN SIMPLER
-# =========================
 
 @app.post("/simplify")
 def simplify(data: Answer):
@@ -217,49 +247,124 @@ Use this exact format:
 
 @app.post("/quiz")
 def create_quiz(data: QuizRequest):
-
+    # Validate the request before calling the AI.
     if data.question_count < 1:
         raise HTTPException(
             status_code=400,
-            detail="Question count must be at least 1"
+            detail="Question count must be at least 1."
         )
 
     if data.question_count > 50:
         raise HTTPException(
             status_code=400,
-            detail="Question count cannot be greater than 50"
+            detail="Question count cannot be greater than 50."
         )
 
-    # =========================
-    # QUIZ FROM SAVED MATERIAL
-    # =========================
+    topic = data.topic.strip()
+    if not topic:
+        raise HTTPException(
+            status_code=400,
+            detail="Please enter a quiz topic."
+        )
 
+    if data.source not in {"topic", "material"}:
+        raise HTTPException(
+            status_code=400,
+            detail="Quiz source must be 'topic' or 'material'."
+        )
+
+    # Build the prompt from the correct source.
     if data.source == "material":
+        if data.session_id is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Select a study session before creating a quiz from saved material."
+            )
+
+        db = SessionLocal()
+        try:
+            session = (
+                db.query(StudySession)
+                .filter(StudySession.id == data.session_id)
+                .first()
+            )
+
+            if session is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Study session not found."
+                )
+
+            session_subject = session.subject
+            session_topic = session.topic
+
+            materials = (
+                db.query(StudyMaterial)
+                .filter(StudyMaterial.session_id == data.session_id)
+                .order_by(StudyMaterial.created_at.asc())
+                .all()
+            )
+
+            usable_materials = [
+                material for material in materials
+                if material.content and material.content.strip()
+            ]
+
+            if not usable_materials:
+                raise HTTPException(
+                    status_code=400,
+                    detail="No readable study material was found in this session. Upload a PDF, add text, or upload an image first."
+                )
+
+            material_sections = []
+            remaining_chars = 16000
+
+            for material in usable_materials:
+                if remaining_chars <= 0:
+                    break
+
+                section = (
+                    f"Material title: {material.title}\\n"
+                    f"Material content:\\n{material.content.strip()}"
+                )
+                section = section[:remaining_chars]
+                material_sections.append(section)
+                remaining_chars -= len(section)
+
+            material_text = "\\n\\n---\\n\\n".join(material_sections).strip()
+
+        finally:
+            db.close()
 
         prompt = f"""
-Create exactly {data.question_count} multiple-choice questions
-ONLY from the following study material.
+You are creating a study quiz for Vaqelix.
 
-Do not use information outside the material.
+Create exactly {data.question_count} multiple-choice questions using ONLY the
+saved study material provided below.
 
-STUDY MATERIAL:
+Study session subject: {session_subject}
+Study session topic: {session_topic}
+Student's requested focus: {topic}
 
-{data.topic}
+IMPORTANT SOURCE RULES:
+- Every question, correct answer, and explanation must be supported by the supplied material.
+- Do not use general knowledge to fill gaps.
+- Do not invent details that are absent from the material.
+- Prefer specific facts, headings, steps, tools, checklists, and concepts actually present in the material.
+- If the requested focus is not covered by the material, make questions about the material that is available rather than inventing facts.
+- Avoid generic questions about what a planner is unless that is specifically explained in the material.
+- Keep language simple and suitable for students.
+- Each question must have exactly four options labelled A, B, C, and D.
+- Exactly one option must be correct.
+- The answer field must be only A, B, C, or D.
+- Give a short explanation grounded in the material.
+- Return a JSON array containing exactly {data.question_count} objects.
+- Return ONLY valid JSON: no Markdown, no code fences, and no extra commentary.
 
-Rules:
-- Every question must be answerable from the material.
-- Use simple student-friendly language.
-- Each question must have exactly 4 options.
-- Options must be labeled A, B, C, and D.
-- Only one option can be correct.
-- The correct answer must be one of A, B, C, or D.
-- Give a short and clear explanation of why the correct answer is correct.
-- The explanation must help a student understand the concept.
-- Return ONLY valid JSON.
-- Do not add Markdown or code fences.
+SAVED STUDY MATERIAL:
+{material_text}
 
-Use exactly this format:
-
+Required JSON format:
 [
   {{
     "question": "Question text",
@@ -270,37 +375,30 @@ Use exactly this format:
       "D": "Option D"
     }},
     "answer": "A",
-    "explanation": "Short explanation of the correct answer."
+    "explanation": "Short explanation supported by the saved material."
   }}
 ]
 """
-
-    # =========================
-    # QUIZ FROM TOPIC
-    # =========================
-
     else:
-
         prompt = f"""
-Create exactly {data.question_count} multiple-choice questions
-for a student studying this topic:
+You are Vaqelix, a study assistant.
 
-{data.topic}
+Create exactly {data.question_count} multiple-choice questions for a student
+studying this topic:
+
+{topic}
 
 Rules:
-- Keep questions educational.
+- Keep every question relevant to the requested topic.
 - Use simple student-friendly language.
-- Each question must have exactly 4 options.
-- Options must be labeled A, B, C, and D.
-- Only one option can be correct.
-- The correct answer must be one of A, B, C, or D.
-- Give a short and clear explanation of why the correct answer is correct.
-- The explanation must help a student understand the concept.
-- Return ONLY valid JSON.
-- Do not add Markdown or code fences.
+- Each question must have exactly four options labelled A, B, C, and D.
+- Exactly one option must be correct.
+- The answer field must be only A, B, C, or D.
+- Give a short, clear explanation of the correct answer.
+- Return a JSON array containing exactly {data.question_count} objects.
+- Return ONLY valid JSON: no Markdown, no code fences, and no extra commentary.
 
-Use exactly this format:
-
+Required JSON format:
 [
   {{
     "question": "Question text",
@@ -318,47 +416,37 @@ Use exactly this format:
 
     response = ask_ai(prompt)
 
-    # Remove markdown code fences if AI adds them
+    # Do not silently return unrelated sample questions when live AI is unavailable.
+    if response.startswith("[MOCK MODE — TEST RESPONSE]"):
+        raise HTTPException(
+            status_code=503,
+            detail="Vaqelix is in mock mode, so it cannot create a real quiz. Check the local AI configuration."
+        )
+
+    # Remove Markdown fences if the model accidentally includes them.
     cleaned = response.strip()
-
-    cleaned = re.sub(
-        r"^```json\s*",
-        "",
-        cleaned,
-        flags=re.IGNORECASE
-    )
-
-    cleaned = re.sub(
-        r"^```\s*",
-        "",
-        cleaned
-    )
-
-    cleaned = re.sub(
-        r"\s*```$",
-        "",
-        cleaned
-    )
+    cleaned = re.sub(r"^```json\\s*", "", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"^```\\s*", "", cleaned)
+    cleaned = re.sub(r"\\s*```$", "", cleaned)
 
     try:
         quiz = json.loads(cleaned)
-
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, TypeError):
         raise HTTPException(
-            status_code=500,
-            detail="AI returned invalid quiz data."
+            status_code=502,
+            detail="The AI returned invalid quiz data. Please try again."
         )
 
     if not isinstance(quiz, list):
         raise HTTPException(
-            status_code=500,
-            detail="Quiz format is invalid."
+            status_code=502,
+            detail="The AI quiz response was not a JSON list. Please try again."
         )
 
     validated_quiz = []
+    required_options = ("A", "B", "C", "D")
 
     for item in quiz:
-
         if not isinstance(item, dict):
             continue
 
@@ -367,47 +455,41 @@ Use exactly this format:
         answer = item.get("answer")
         explanation = item.get("explanation")
 
-        if not question:
+        if not isinstance(question, str) or not question.strip():
             continue
-
         if not isinstance(options, dict):
             continue
-
-        required_options = ["A", "B", "C", "D"]
-
-        if not all(option in options for option in required_options):
+        if not all(
+            isinstance(options.get(key), str) and options[key].strip()
+            for key in required_options
+        ):
             continue
-
-        if answer not in required_options:
+        if not isinstance(answer, str) or answer.strip().upper() not in required_options:
             continue
-
-        if not explanation:
-            explanation = (
-                "Review the question and the correct answer "
-                "to understand this concept."
-            )
+        if not isinstance(explanation, str) or not explanation.strip():
+            continue
 
         validated_quiz.append({
-            "question": question,
+            "question": question.strip(),
             "options": {
-                "A": options["A"],
-                "B": options["B"],
-                "C": options["C"],
-                "D": options["D"]
+                key: options[key].strip()
+                for key in required_options
             },
-            "answer": answer,
-            "explanation": explanation
+            "answer": answer.strip().upper(),
+            "explanation": explanation.strip()
         })
 
     if len(validated_quiz) < data.question_count:
         raise HTTPException(
-            status_code=500,
-            detail="AI did not generate enough valid quiz questions."
+            status_code=502,
+            detail=(
+                f"The AI returned only {len(validated_quiz)} valid questions "
+                f"out of {data.question_count}. Please try again."
+            )
         )
 
-    return {
-        "quiz": validated_quiz[:data.question_count]
-    }
+    return {"quiz": validated_quiz[:data.question_count]}
+
 
 # =========================
 # CREATE STUDY SESSION
@@ -692,6 +774,178 @@ def save_study_material(
         db.close()
 
 
+
+# =========================
+# BACKGROUND PDF PROCESSING
+# =========================
+
+from pathlib import Path
+import uuid
+
+PDF_UPLOAD_DIR = Path("uploads/pdfs")
+PDF_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def process_pdf_job(job_id: int):
+    db = SessionLocal()
+
+    try:
+        job = (
+            db.query(PDFProcessingJob)
+            .filter(PDFProcessingJob.id == job_id)
+            .first()
+        )
+
+        if job is None:
+            return
+
+        pdf_path = Path(job.pdf_path)
+        pdf_data = pdf_path.read_bytes()
+        reader = PdfReader(BytesIO(pdf_data))
+
+        if reader.is_encrypted:
+            raise ValueError("This PDF is password-protected.")
+
+        total_pages = len(reader.pages)
+
+        if total_pages == 0:
+            raise ValueError("This PDF contains no pages.")
+
+        material = None
+
+        if job.material_id:
+            material = (
+                db.query(StudyMaterial)
+                .filter(StudyMaterial.id == job.material_id)
+                .first()
+            )
+
+        if material is None:
+            material = StudyMaterial(
+                session_id=job.session_id,
+                title=job.title,
+                content=""
+            )
+            db.add(material)
+            db.commit()
+            db.refresh(material)
+            job.material_id = material.id
+
+        job.status = "processing"
+        job.stage = "Extracting selectable text"
+        job.total_pages = total_pages
+        job.processed_pages = 0
+        job.error = ""
+        db.commit()
+
+        # First, extract selectable text in small batches.
+        text_pages = []
+        batch_size = 5
+
+        for start in range(0, total_pages, batch_size):
+            end = min(start + batch_size, total_pages)
+
+            for page_index in range(start, end):
+                page_text = reader.pages[page_index].extract_text() or ""
+                text_pages.append(page_text)
+
+            material.content = "\n\n".join(
+                text for text in text_pages if text.strip()
+            ).strip()
+
+            job.processed_pages = end
+            job.stage = "Extracting selectable text"
+            job.extraction_method = "text"
+            db.commit()
+
+        original_content = material.content or ""
+
+        # If almost no text was found, OCR the pages in small batches.
+        if len(original_content) < 50:
+            job.stage = "Reading scanned pages (OCR)"
+            job.extraction_method = "OCR"
+            job.processed_pages = 0
+            material.content = ""
+            db.commit()
+
+            ocr_pages = []
+
+            for start in range(1, total_pages + 1, batch_size):
+                end = min(start + batch_size - 1, total_pages)
+
+                images = convert_from_bytes(
+                    pdf_data,
+                    dpi=120,
+                    first_page=start,
+                    last_page=end,
+                    fmt="png",
+                    thread_count=1
+                )
+
+                for image in images:
+                    page_text = pytesseract.image_to_string(
+                        image,
+                        lang="eng"
+                    )
+                    ocr_pages.append(page_text)
+
+                ocr_content = "\n\n".join(
+                    text for text in ocr_pages if text.strip()
+                ).strip()
+
+                material.content = ocr_content
+                job.processed_pages = end
+                job.stage = f"Reading scanned pages (OCR): {end}/{total_pages}"
+                db.commit()
+
+            # Keep the original text if OCR did not improve it.
+            if len(material.content or "") <= len(original_content):
+                material.content = original_content
+                job.extraction_method = "text"
+
+        if not (material.content or "").strip():
+            raise ValueError(
+                "No readable text was found. The PDF may be blank or "
+                "require a different OCR language."
+            )
+
+        session = (
+            db.query(StudySession)
+            .filter(StudySession.id == job.session_id)
+            .first()
+        )
+
+        if session:
+            session.updated_at = datetime.utcnow()
+
+        job.status = "completed"
+        job.stage = "Completed"
+        job.processed_pages = total_pages
+        job.error = ""
+        db.commit()
+
+    except Exception as exc:
+        db.rollback()
+
+        try:
+            job = (
+                db.query(PDFProcessingJob)
+                .filter(PDFProcessingJob.id == job_id)
+                .first()
+            )
+
+            if job:
+                job.status = "failed"
+                job.stage = "Processing failed"
+                job.error = str(exc)[:4000]
+                db.commit()
+        except Exception:
+            db.rollback()
+
+    finally:
+        db.close()
+
+
 # =========================
 # UPLOAD PDF STUDY MATERIAL
 # =========================
@@ -699,38 +953,37 @@ def save_study_material(
 @app.post("/sessions/{session_id}/materials/upload-pdf")
 async def upload_pdf(
     session_id: int,
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...)
 ):
-
     db = SessionLocal()
+    saved_path = None
 
     try:
-        # Check study session
-        session = db.query(StudySession).filter(
-            StudySession.id == session_id
-        ).first()
+        session = (
+            db.query(StudySession)
+            .filter(StudySession.id == session_id)
+            .first()
+        )
 
-        if not session:
+        if session is None:
             raise HTTPException(
                 status_code=404,
                 detail="Study session not found"
             )
 
-        # Check filename
         if not file.filename:
             raise HTTPException(
                 status_code=400,
                 detail="No file selected"
             )
 
-        # Only PDFs
         if not file.filename.lower().endswith(".pdf"):
             raise HTTPException(
                 status_code=400,
                 detail="Only PDF files are allowed"
             )
 
-        # Read PDF
         pdf_data = await file.read()
 
         if not pdf_data:
@@ -739,48 +992,124 @@ async def upload_pdf(
                 detail="The PDF file is empty"
             )
 
-        # Read PDF pages
-        reader = PdfReader(BytesIO(pdf_data))
+        try:
+            reader = PdfReader(BytesIO(pdf_data))
 
-        extracted_pages = []
+            if reader.is_encrypted:
+                raise HTTPException(
+                    status_code=400,
+                    detail="This PDF is password-protected. Please upload an unlocked PDF."
+                )
 
-        for page in reader.pages:
-            page_text = page.extract_text()
+            page_count = len(reader.pages)
 
-            if page_text:
-                extracted_pages.append(page_text)
+            if page_count == 0:
+                raise HTTPException(
+                    status_code=400,
+                    detail="This PDF contains no pages."
+                )
 
-        # Combine extracted text
-        content = "\n\n".join(extracted_pages).strip()
-
-        if not content:
+        except HTTPException:
+            raise
+        except Exception as exc:
             raise HTTPException(
                 status_code=400,
-                detail="Could not extract readable text from this PDF."
-            )
+                detail=f"Could not read this PDF: {exc}"
+            ) from exc
 
-        # Save extracted PDF text as study material
-        material = StudyMaterial(
+        safe_name = f"{uuid.uuid4().hex}.pdf"
+        saved_path = PDF_UPLOAD_DIR / safe_name
+        saved_path.write_bytes(pdf_data)
+
+        job = PDFProcessingJob(
             session_id=session_id,
-            title=file.filename,
-            content=content
+            title=file.filename[:200],
+            pdf_path=str(saved_path),
+            status="queued",
+            stage="Waiting to start",
+            total_pages=page_count,
+            processed_pages=0
         )
 
-        db.add(material)
-
-        # Update session activity
-        session.updated_at = datetime.utcnow()
-
+        db.add(job)
         db.commit()
-        db.refresh(material)
+        db.refresh(job)
+
+        background_tasks.add_task(process_pdf_job, job.id)
 
         return {
-            "message": "PDF uploaded successfully",
-            "id": material.id,
-            "session_id": material.session_id,
-            "title": material.title,
-            "pages": len(reader.pages),
-            "content_length": len(content)
+            "message": "PDF accepted for background processing",
+            "job_id": job.id,
+            "session_id": session_id,
+            "title": job.title,
+            "pages": page_count,
+            "status": job.status
+        }
+
+    except HTTPException:
+        if saved_path and saved_path.exists():
+            saved_path.unlink()
+        raise
+
+    except Exception as exc:
+        db.rollback()
+
+        if saved_path and saved_path.exists():
+            saved_path.unlink()
+
+        raise HTTPException(
+            status_code=500,
+            detail=f"Could not start PDF processing: {exc}"
+        ) from exc
+
+    finally:
+        await file.close()
+        db.close()
+
+
+# =========================
+# CHECK PDF PROCESSING STATUS
+# =========================
+
+@app.get("/pdf-jobs/{job_id}")
+def get_pdf_job_status(job_id: int):
+    db = SessionLocal()
+
+    try:
+        job = (
+            db.query(PDFProcessingJob)
+            .filter(PDFProcessingJob.id == job_id)
+            .first()
+        )
+
+        if job is None:
+            raise HTTPException(
+                status_code=404,
+                detail="PDF processing job not found"
+            )
+
+        progress = 0
+
+        if job.total_pages > 0:
+            progress = round(
+                job.processed_pages / job.total_pages * 100
+            )
+
+        if job.status == "completed":
+            progress = 100
+
+        return {
+            "job_id": job.id,
+            "session_id": job.session_id,
+            "title": job.title,
+            "status": job.status,
+            "stage": job.stage,
+            "total_pages": job.total_pages,
+            "processed_pages": job.processed_pages,
+            "progress": progress,
+            "material_id": job.material_id,
+            "extraction_method": job.extraction_method,
+            "error": job.error
         }
 
     finally:

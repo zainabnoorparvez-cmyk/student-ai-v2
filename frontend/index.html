@@ -855,21 +855,22 @@
 
 
         <div class="form-group">
+            <label for="quizSource">Quiz Source</label>
+            <select id="quizSource">
+                <option value="topic" selected>By Topic</option>
+                <option value="material">From My Study Material</option>
+            </select>
+        </div>
 
-            <label for="quizCount">
-                Number of Questions
-            </label>
-
+        <div class="form-group">
+            <label for="quizCount">Number of Questions</label>
             <select id="quizCount">
-
                 <option value="3">3</option>
                 <option value="5" selected>5</option>
                 <option value="10">10</option>
                 <option value="15">15</option>
                 <option value="20">20</option>
-
             </select>
-
         </div>
 
 
@@ -1000,7 +1001,7 @@
 
 <script>
 
-const API_BASE = "";
+const API_BASE = "http://127.0.0.1:8000";
 
 
 /* =========================
@@ -1127,6 +1128,9 @@ const practiceResult =
 
 const quizTopic =
     document.getElementById("quizTopic");
+
+const quizSource =
+    document.getElementById("quizSource");
 
 const quizCount =
     document.getElementById("quizCount");
@@ -1991,103 +1995,96 @@ function renderMaterials() {
 ========================= */
 
 async function uploadPdf() {
-
     if (!currentSessionId) {
-
-        showNotice(
-            pdfNotice,
-            "Please create or select a study session first."
-        );
-
+        showNotice(pdfNotice, "Please create or select a study session first.");
         return;
     }
 
-
-    const file =
-        pdfFile.files[0];
-
+    const sessionId = currentSessionId;
+    const file = pdfFile.files[0];
 
     if (!file) {
-
-        showNotice(
-            pdfNotice,
-            "Please choose a PDF file."
-        );
-
+        showNotice(pdfNotice, "Please choose a PDF file.");
         return;
     }
 
-
-    if (
-        !file.name
-            .toLowerCase()
-            .endsWith(".pdf")
-    ) {
-
-        showNotice(
-            pdfNotice,
-            "Please select a PDF file."
-        );
-
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+        showNotice(pdfNotice, "Please select a PDF file.");
         return;
     }
-
 
     uploadPdfButton.disabled = true;
 
-
-    showNotice(
-        pdfNotice,
-        "Uploading PDF...",
-        "success"
-    );
-
-
     try {
+        showNotice(pdfNotice, "Uploading PDF...", "success");
 
-        const formData =
-            new FormData();
+        const formData = new FormData();
+        formData.append("file", file);
 
-        formData.append(
-            "file",
-            file
+        const uploadData = await apiFetch(
+            "/sessions/" + sessionId + "/materials/upload-pdf",
+            {
+                method: "POST",
+                body: formData
+            }
         );
 
-
-        const data =
-            await apiFetch(
-                "/sessions/" +
-                currentSessionId +
-                "/materials/upload-pdf",
-                {
-                    method: "POST",
-                    body: formData
-                }
-            );
-
-
-        pdfFile.value = "";
-
+        if (!uploadData.job_id) {
+            throw new Error("The server did not return a PDF processing job ID.");
+        }
 
         showNotice(
             pdfNotice,
-            "PDF uploaded and saved successfully! 📄",
+            "PDF received. Preparing to process " +
+                uploadData.pages + " pages...",
             "success"
         );
 
+        while (true) {
+            await new Promise(resolve => setTimeout(resolve, 1200));
 
-        await loadMaterials();
+            const status = await apiFetch(
+                "/pdf-jobs/" + uploadData.job_id
+            );
 
+            if (status.status === "completed") {
+                pdfFile.value = "";
 
+                showNotice(
+                    pdfNotice,
+                    "PDF processed successfully! " +
+                        status.total_pages + " pages completed.",
+                    "success"
+                );
+
+                await loadMaterials();
+                break;
+            }
+
+            if (status.status === "failed") {
+                throw new Error(
+                    status.error || "PDF processing failed."
+                );
+            }
+
+            const processed = status.processed_pages || 0;
+            const total = status.total_pages || uploadData.pages || 0;
+            const progress = status.progress || 0;
+            const stage = status.stage || "Waiting to start";
+
+            showNotice(
+                pdfNotice,
+                "Processing PDF: " + processed + "/" + total +
+                    " pages (" + progress + "%). " + stage,
+                "success"
+            );
+        }
     } catch (error) {
-
         showNotice(
             pdfNotice,
-            error.message
+            error.message || "Could not upload or process this PDF."
         );
-
     } finally {
-
         uploadPdfButton.disabled = false;
     }
 }
@@ -2888,7 +2885,8 @@ async function generateQuiz() {
                     body: JSON.stringify({
                         topic: topic,
                         question_count: count,
-                        source: "topic"
+                        source: quizSource.value,
+                        session_id: currentSessionId
                     })
                 }
             );

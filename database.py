@@ -156,6 +156,87 @@ class StudyMaterial(Base):
     )
 
 
+
+class PDFProcessingJob(Base):
+
+    __tablename__ = "pdf_processing_jobs"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    session_id = Column(
+        Integer,
+        ForeignKey("study_sessions.id"),
+        nullable=False
+    )
+
+    title = Column(
+        String(200),
+        nullable=False
+    )
+
+    pdf_path = Column(
+        String(500),
+        nullable=False
+    )
+
+    status = Column(
+        String(30),
+        default="queued",
+        nullable=False
+    )
+
+    stage = Column(
+        String(50),
+        default="Waiting to start",
+        nullable=False
+    )
+
+    total_pages = Column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+
+    processed_pages = Column(
+        Integer,
+        default=0,
+        nullable=False
+    )
+
+    material_id = Column(
+        Integer,
+        ForeignKey("study_materials.id"),
+        nullable=True
+    )
+
+    extraction_method = Column(
+        String(20),
+        default="",
+        nullable=False
+    )
+
+    error = Column(
+        Text,
+        default="",
+        nullable=False
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow
+    )
+
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow
+    )
+
+
 Base.metadata.create_all(
     bind=engine
 )
